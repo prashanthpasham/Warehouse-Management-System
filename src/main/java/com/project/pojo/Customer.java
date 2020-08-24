@@ -1,6 +1,7 @@
 package com.project.pojo;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -31,6 +33,7 @@ public class Customer {
 	private Address address;
 	private BusinessTerritory businessTerritory;
 	private CustomerTypes customerTypes;
+	private List<DeliveryAddress> deliveryAddress;
 
 	@Id
 	@Column(name = "CUSTOMER_ID")
@@ -43,7 +46,7 @@ public class Customer {
 		this.customerId = customerId;
 	}
 
-	@Column(name = "CUSTOMER_CODE",unique=true)
+	@Column(name = "CUSTOMER_CODE", unique = true)
 	public String getCustomerCode() {
 		return customerCode;
 	}
@@ -147,7 +150,7 @@ public class Customer {
 	}
 
 	@JoinColumn(name = "CUSTOMER_TYPE_ID")
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@Fetch(FetchMode.SUBSELECT)
 	public CustomerTypes getCustomerTypes() {
 		return customerTypes;
@@ -155,6 +158,15 @@ public class Customer {
 
 	public void setCustomerTypes(CustomerTypes customerTypes) {
 		this.customerTypes = customerTypes;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "customerId")
+	public List<DeliveryAddress> getDeliveryAddress() {
+		return deliveryAddress;
+	}
+
+	public void setDeliveryAddress(List<DeliveryAddress> deliveryAddress) {
+		this.deliveryAddress = deliveryAddress;
 	}
 
 }

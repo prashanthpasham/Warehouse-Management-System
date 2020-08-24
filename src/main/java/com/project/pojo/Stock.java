@@ -31,6 +31,8 @@ public class Stock {
 	private UOMConfiguration uomConfigId;
 	private Date createdDate;
 	private Date modifiedDate;
+	private String defaultPackSize;
+	private Double defaultPackQty;
 	private List<Images> images;
 
 	@Id
@@ -125,6 +127,22 @@ public class Stock {
 
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
+	}
+    @Column(name="DEFAULT_PACK_SIZE")
+	public String getDefaultPackSize() {
+		return defaultPackSize;
+	}
+
+	public void setDefaultPackSize(String defaultPackSize) {
+		this.defaultPackSize = defaultPackSize;
+	}
+	 @Column(name="DEFAULT_PACK_QTY")
+	public Double getDefaultPackQty() {
+		return defaultPackQty;
+	}
+
+	public void setDefaultPackQty(Double defaultPackQty) {
+		this.defaultPackQty = defaultPackQty;
 	}
 
 	@OneToMany(cascade=CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "stockId")
