@@ -102,7 +102,7 @@ public class Stock {
 
 	@JoinColumn(name = "UOM_CONFIG_ID")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@Fetch(FetchMode.SUBSELECT)
+	@Fetch(FetchMode.JOIN)
 	public UOMConfiguration getUomConfigId() {
 		return uomConfigId;
 	}
@@ -146,7 +146,7 @@ public class Stock {
 	}
 
 	@OneToMany(cascade=CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "stockId")
-	@Fetch(FetchMode.JOIN)
+	@Fetch(FetchMode.SUBSELECT)
 	public List<Images> getImages() {
 		return images;
 	}

@@ -13,6 +13,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 @Entity
 @Table(name = "INVENTORY_SERIAL_DETAILS")
 public class InventorySerialDetails {
@@ -37,6 +40,7 @@ public class InventorySerialDetails {
 
 	@JoinColumn(name = "INVENTORY_DETAILS_ID")
 	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public WarehouseInventoryDetails getInventoryDetails() {
 		return inventoryDetails;
 	}

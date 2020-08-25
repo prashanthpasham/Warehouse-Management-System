@@ -9,6 +9,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 @Entity
 @Table(name = "USERS")
 public class Users {
@@ -85,6 +88,7 @@ public class Users {
 	}
 	@JoinColumn(name = "ROLE")
 	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public Role getRole() {
 		return role;
 	}
@@ -94,6 +98,7 @@ public class Users {
 	}
 	@JoinColumn(name = "ACCESS_HIERARCHY_ID")
 	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public UserAccessHierarchy getAccessHierarchy() {
 		return accessHierarchy;
 	}
@@ -103,6 +108,7 @@ public class Users {
 	}
 	@JoinColumn(name = "BUSINESS_TERRITORY_ID")
 	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public BusinessTerritory getBusinessTerritory() {
 		return businessTerritory;
 	}

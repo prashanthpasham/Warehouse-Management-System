@@ -4,10 +4,16 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "IMAGES")
@@ -16,7 +22,7 @@ public class Images {
 	private String imagePath;
 	private Date createdDate;
 	private Date modifiedDate;
-	private Integer stockId;
+	private Stock stockId;
 
 	@Id
 	@Column(name = "IMAGE_ID")
@@ -56,12 +62,14 @@ public class Images {
 		this.modifiedDate = modifiedDate;
 	}
 
-	@Column(name = "STOCK_ID")
-	public Integer getStockId() {
+	@JoinColumn(name = "STOCK_ID")
+	@ManyToOne(fetch=FetchType.LAZY)
+	@Fetch(FetchMode.JOIN)
+	public Stock getStockId() {
 		return stockId;
 	}
 
-	public void setStockId(Integer stockId) {
+	public void setStockId(Stock stockId) {
 		this.stockId = stockId;
 	}
 

@@ -35,7 +35,7 @@ public class TaxStocks {
 
 	@JoinColumn(name = "STOCK_ID")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@Fetch(FetchMode.SUBSELECT)
+	@Fetch(FetchMode.JOIN)
 	public Stock getStock() {
 		return stock;
 	}

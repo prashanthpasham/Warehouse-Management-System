@@ -11,6 +11,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 @Entity
 @Table(name = "WAREHOUSE")
 public class Warehouse {
@@ -92,6 +95,7 @@ public class Warehouse {
 
 	@JoinColumn(name = "WAREHOUSE_TYPE_ID")
 	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public MasterLookUp getWarehouseType() {
 		return warehouseType;
 	}
@@ -102,6 +106,7 @@ public class Warehouse {
 
 	@JoinColumn(name = "BUSINESS_ID")
 	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public BusinessTerritory getBusinessTerritory() {
 		return businessTerritory;
 	}
@@ -112,6 +117,7 @@ public class Warehouse {
 
 	@JoinColumn(name = "ADDRESS_ID")
 	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public Address getAddress() {
 		return address;
 	}

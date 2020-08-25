@@ -9,6 +9,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 @Entity
 @Table(name = "WAREHOUSE_INVENTORY")
 public class WarehouseInventoryDetails {
@@ -32,6 +35,7 @@ public class WarehouseInventoryDetails {
 
 	@JoinColumn(name = "STOCK_ID")
 	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public Stock getStock() {
 		return stock;
 	}
@@ -40,8 +44,9 @@ public class WarehouseInventoryDetails {
 		this.stock = stock;
 	}
 
-	@JoinColumn(name = "STOCK_ID")
+	@JoinColumn(name = "INVENTORY_ID")
 	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public WarehouseInventory getInventory() {
 		return inventory;
 	}

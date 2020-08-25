@@ -109,7 +109,7 @@ public class Customer {
 		this.email = email;
 	}
 
-	@Column(name = "EMAIL")
+	@Column(name = "TRANSACTION_TYPE")
 	public String getTransactionType() {
 		return transactionType;
 	}
@@ -129,7 +129,7 @@ public class Customer {
 
 	@JoinColumn(name = "ADDRESS_ID")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@Fetch(FetchMode.SUBSELECT)
+	@Fetch(FetchMode.JOIN)
 	public Address getAddress() {
 		return address;
 	}
@@ -140,7 +140,7 @@ public class Customer {
 
 	@JoinColumn(name = "BUSINESS_TERRITORY")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@Fetch(FetchMode.SUBSELECT)
+	@Fetch(FetchMode.JOIN)
 	public BusinessTerritory getBusinessTerritory() {
 		return businessTerritory;
 	}
@@ -151,7 +151,7 @@ public class Customer {
 
 	@JoinColumn(name = "CUSTOMER_TYPE_ID")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@Fetch(FetchMode.SUBSELECT)
+	@Fetch(FetchMode.JOIN)
 	public CustomerTypes getCustomerTypes() {
 		return customerTypes;
 	}

@@ -2,10 +2,16 @@ package com.project.pojo;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "DELIVERY_ADDRESS")
@@ -15,7 +21,7 @@ public class DeliveryAddress {
 	private String street;
 	private String zipCode;
 	private String city;
-	private Integer customerId;
+	private Customer customerId;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -63,13 +69,14 @@ public class DeliveryAddress {
 	public void setCity(String city) {
 		this.city = city;
 	}
-
-	@Column(name = "CUSTOMER_ID")
-	public Integer getCustomerId() {
+    @ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name = "CUSTOMER_ID")
+    @Fetch(FetchMode.JOIN)
+	public Customer getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(Integer customerId) {
+	public void setCustomerId(Customer customerId) {
 		this.customerId = customerId;
 	}
 

@@ -24,7 +24,7 @@ public class OrderItems {
 	private Orders orders;
 
 	@Id
-	@Column(name = "ORDER_ID")
+	@Column(name = "ORDER_ITEMS_ID")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	public Integer getOrderItemId() {
 		return orderItemId;

@@ -52,7 +52,7 @@ public class BusinessTerritory {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "MASTER_LOOKUP_ID")
-	@Fetch(FetchMode.SUBSELECT)
+	@Fetch(FetchMode.JOIN)
 	public MasterLookUp getMasterLookUp() {
 		return masterLookUp;
 	}

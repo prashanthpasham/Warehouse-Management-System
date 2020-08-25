@@ -43,7 +43,7 @@ public class DeliveryOrdersTrack {
 		return items;
 	}
 
-	public void setDeliveryOrderItems(DeliveryOrderItems items) {
+	public void setItems(DeliveryOrderItems items) {
 		this.items = items;
 	}
 

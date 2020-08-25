@@ -9,6 +9,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 @Table(name = "ROLE_MENU_ITEM")
 @Entity
 public class RoleMenuItem {
@@ -32,6 +35,7 @@ public class RoleMenuItem {
 
 	@JoinColumn(name = "MENU_ITEM_ID")
 	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public MenuItem getMenuItem() {
 		return menuItem;
 	}
@@ -40,8 +44,9 @@ public class RoleMenuItem {
 		this.menuItem = menuItem;
 	}
 
-	@JoinColumn(name = "ROLE")
+	@JoinColumn(name = "ROLE_ID")
 	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public Role getRole() {
 		return role;
 	}
@@ -50,7 +55,7 @@ public class RoleMenuItem {
 		this.role = role;
 	}
 
-	@Column(name = "ADD_OPERATION")
+	@Column(name = "ADD_OPERATION",columnDefinition="Number")
 	public boolean isAddOperation() {
 		return addOperation;
 	}
@@ -59,7 +64,7 @@ public class RoleMenuItem {
 		this.addOperation = addOperation;
 	}
 
-	@Column(name = "EDIT_OPERATION")
+	@Column(name = "EDIT_OPERATION",columnDefinition="Number(10,0) NOT NULL")
 	public boolean isEditOperation() {
 		return editOperation;
 	}
@@ -68,7 +73,7 @@ public class RoleMenuItem {
 		this.editOperation = editOperation;
 	}
 
-	@Column(name = "DELETE_OPERATION")
+	@Column(name = "DELETE_OPERATION",columnDefinition="Number")
 	public boolean isDeleteOperation() {
 		return deleteOperation;
 	}

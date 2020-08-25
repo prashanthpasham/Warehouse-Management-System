@@ -13,6 +13,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 @Table(name = "MENU_ITEM")
 @Entity
 public class MenuItem {
@@ -52,6 +55,7 @@ public class MenuItem {
 	}
     @JoinColumn(name="MENU_GROUP_ID")
     @ManyToOne
+    @Fetch(FetchMode.JOIN)
 	public MenuGroup getMenuGroup() {
 		return menuGroup;
 	}

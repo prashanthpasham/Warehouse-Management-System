@@ -52,7 +52,7 @@ public class StockLookUp {
 
 	@JoinColumn(name = "MASTER_LOOKUP_ID")
 	@ManyToOne(fetch = FetchType.LAZY)
-	@Fetch(FetchMode.SUBSELECT)
+	@Fetch(FetchMode.JOIN)
 	public MasterLookUp getMasterLookUp() {
 		return masterLookUp;
 	}
