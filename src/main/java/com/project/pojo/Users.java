@@ -23,9 +23,9 @@ public class Users {
 	private String email;
 	private String phoneNo;
 	private Role role;
-	private UserAccessHierarchy accessHierarchy;
+	private Integer accessHierarchy;
 	private BusinessTerritory businessTerritory;
-	private Address address;
+	private Integer address;
 
 	@Id
 	@Column(name = "USER_ID")
@@ -96,14 +96,12 @@ public class Users {
 	public void setRole(Role role) {
 		this.role = role;
 	}
-	@JoinColumn(name = "ACCESS_HIERARCHY_ID")
-	@ManyToOne
-	@Fetch(FetchMode.JOIN)
-	public UserAccessHierarchy getAccessHierarchy() {
+	@Column(name = "ACCESS_HIERARCHY_ID")
+	public Integer getAccessHierarchy() {
 		return accessHierarchy;
 	}
 
-	public void setAccessHierarchy(UserAccessHierarchy accessHierarchy) {
+	public void setAccessHierarchy(Integer accessHierarchy) {
 		this.accessHierarchy = accessHierarchy;
 	}
 	@JoinColumn(name = "BUSINESS_TERRITORY_ID")
@@ -116,13 +114,12 @@ public class Users {
 	public void setBusinessTerritory(BusinessTerritory businessTerritory) {
 		this.businessTerritory = businessTerritory;
 	}
-	@JoinColumn(name = "Address_Id")
-	@ManyToOne
-	public Address getAddress() {
+	@Column(name = "Address_Id")
+	public Integer getAddress() {
 		return address;
 	}
 
-	public void setAddress(Address address) {
+	public void setAddress(Integer address) {
 		this.address = address;
 	}
 
