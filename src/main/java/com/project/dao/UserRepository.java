@@ -7,8 +7,10 @@ import org.springframework.stereotype.Repository;
 import com.project.pojo.Users;
 
 @Repository
-public interface UserRepository extends CrudRepository<Users, Integer>{
-  public Users findByUserNameAndPassword(String userName,String password);
-@Query("select count(*) from Users u")
-public int findUsersCount();
+public interface UserRepository extends CrudRepository<Users, Integer> {
+	
+	public Users findByUserNameAndPassword(String userName, String password);
+
+	@Query("select count(*) from Users u")
+	public int findUsersCount();
 }

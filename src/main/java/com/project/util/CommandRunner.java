@@ -47,19 +47,24 @@ public class CommandRunner implements CommandLineRunner {
 
 	public void scheduleJobs() {
 		try {
+			
 			SchedulerFactory factory = new StdSchedulerFactory();
 			Scheduler scheduler = factory.getScheduler();
+			if (scheduler != null) {
+				scheduler.clear();
+			}
 			List<ScheduleJobs> jobsList = loginServiceIntf.scheduleJobs("active");
 			for (ScheduleJobs job : jobsList) {
 				JobDetail detail = JobBuilder.newJob(JobRunner.class).withIdentity(job.getJobName(), "group").build();
-				TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger().withIdentity(job.getJobName(), "Trigger")
-						.startAt(job.getCreatedDate());
-				Trigger trigger=null;
+				TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger()
+						.withIdentity(job.getJobName(), "Trigger").startAt(job.getCreatedDate());
+				Trigger trigger = null;
 				if (job.getCronExpression() == null) {
-					trigger=triggerBuilder.withSchedule(SimpleScheduleBuilder.simpleSchedule()
+					trigger = triggerBuilder.withSchedule(SimpleScheduleBuilder.simpleSchedule()
 							.withIntervalInSeconds(job.getIntervalInSec()).withRepeatCount(-1)).build();
 				} else {
-					trigger=triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(job.getCronExpression())).build();
+					trigger = triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(job.getCronExpression()))
+							.build();
 				}
 				detail.getJobDataMap().put(JobRunner.SCHEDULE_KEY, job.getJobName());
 				scheduler.scheduleJob(detail, trigger);

@@ -23,12 +23,12 @@ public class AESEncryption {
 	Cipher encryptCipher = null;
 	Cipher decryptCipher = null;
 	static AESEncryption instance = null;
-
+    public static String encodedKey="t7GcYbbdbKxZtV2ge6qpeQ==";
 	public static AESEncryption getInstance() {
 		return instance;
 	}
 
-	public static void init(String encodedKey) throws Exception {
+	public static void init() throws Exception {
 		instance = new AESEncryption(encodedKey, "AES/CBC/PKCS5Padding");
 	}
 
@@ -94,7 +94,7 @@ public class AESEncryption {
 
 	public static void main(String[] args) {
 		try {
-			AESEncryption.init("t7GcYbbdbKxZtV2ge6qpeQ==");
+			AESEncryption.init();
 
 			String input = "malawi#welcome";
 			String encodedString = AESEncryption.getInstance().encode(input);
