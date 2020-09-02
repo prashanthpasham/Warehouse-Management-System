@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 
 import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import com.project.dao.ScheduleJobsRepository;
 import com.project.pojo.ScheduleJobs;
+import com.project.service.intf.FileImportServiceIntf;
 import com.project.service.intf.LoginServiceInf;
 
 @Component
@@ -27,6 +29,8 @@ import com.project.service.intf.LoginServiceInf;
 public class CommandRunner implements CommandLineRunner {
 	@Autowired
 	private LoginServiceInf loginServiceIntf;
+	@Autowired
+	private FileImportServiceIntf fileImportServiceIntf;
 	/*
 	 * @Autowired private RoleRepository roleRepo;
 	 * 
@@ -66,7 +70,9 @@ public class CommandRunner implements CommandLineRunner {
 					trigger = triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(job.getCronExpression()))
 							.build();
 				}
-				detail.getJobDataMap().put(JobRunner.SCHEDULE_KEY, job.getJobName());
+				JobDataMap jobMap = detail.getJobDataMap();
+				jobMap.put(JobRunner.SCHEDULE_KEY, job.getJobName());
+				jobMap.put(JobRunner.IMPORT_INTF,fileImportServiceIntf);
 				scheduler.scheduleJob(detail, trigger);
 			}
 			scheduler.start();

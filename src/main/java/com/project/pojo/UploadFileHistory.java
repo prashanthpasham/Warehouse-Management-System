@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Table(name = "UPLOAD_FILE_HISTORY")
 @Entity
 public class UploadFileHistory {
@@ -18,7 +20,8 @@ public class UploadFileHistory {
 	private Date uploadedDate;
 	private Date processDate;
 	private String status;
-	private String filePath;
+	private String fileName;
+	private String reason;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -76,13 +79,22 @@ public class UploadFileHistory {
 		this.status = status;
 	}
 
-	@Column(name = "FILE_PATH")
-	public String getFilePath() {
-		return filePath;
+	@Column(name = "FILE_NAME")
+	public String getFileName() {
+		return fileName;
 	}
 
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	@Column(name = "REASON")
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 
 }
