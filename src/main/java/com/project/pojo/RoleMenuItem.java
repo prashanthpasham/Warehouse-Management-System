@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -23,7 +24,8 @@ public class RoleMenuItem {
 	private boolean deleteOperation;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO,generator = "seq_role_menu_item")
+	@SequenceGenerator(allocationSize = 1,sequenceName = "seq_role_menu_item",name = "seq_role_menu_item")
 	@Column(name = "ROLE_MENU_ID")
 	public Integer getRoleMenuId() {
 		return roleMenuId;

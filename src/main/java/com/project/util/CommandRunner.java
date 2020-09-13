@@ -19,8 +19,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import com.project.dao.MenuGroupRepository;
+import com.project.dao.MenuItemRepository;
+import com.project.dao.RoleMenuItemRepository;
+import com.project.dao.RoleRepository;
 import com.project.dao.ScheduleJobsRepository;
+import com.project.dao.UserRepository;
+import com.project.pojo.MenuGroup;
+import com.project.pojo.MenuItem;
+import com.project.pojo.Role;
+import com.project.pojo.RoleMenuItem;
 import com.project.pojo.ScheduleJobs;
+import com.project.pojo.Users;
 import com.project.service.intf.FileImportServiceIntf;
 import com.project.service.intf.LoginServiceInf;
 
@@ -31,27 +41,28 @@ public class CommandRunner implements CommandLineRunner {
 	private LoginServiceInf loginServiceIntf;
 	@Autowired
 	private FileImportServiceIntf fileImportServiceIntf;
-	/*
-	 * @Autowired private RoleRepository roleRepo;
-	 * 
-	 * @Autowired private MenuGroupRepository menuGrpRepo;
-	 * 
-	 * @Autowired private MenuItemRepository menuItemRepo;
-	 * 
-	 * @Autowired private RoleMenuItemRepository roleMenuItemRepo;
-	 * 
-	 * @Autowired private UserRepository userRepository;
-	 */
-	/* @Autowired private ScheduleJobsRepository scheduleRepo;*/
+
+	
+	  @Autowired private RoleRepository roleRepo;
+	  
+	  @Autowired private MenuGroupRepository menuGrpRepo;
+	  
+	  @Autowired private MenuItemRepository menuItemRepo;
+	  
+	  @Autowired private RoleMenuItemRepository roleMenuItemRepo;
+	  
+	  @Autowired private UserRepository userRepository;
+	 
+	 @Autowired private ScheduleJobsRepository scheduleRepo; 
 	public void run(String... args) throws Exception {
-		// executeScriptsOnEmptySchema();
-		scheduleJobs();
-		
+		//executeScriptsOnEmptySchema();
+		//scheduleJobs();
+
 	}
 
 	public void scheduleJobs() {
 		try {
-			
+
 			SchedulerFactory factory = new StdSchedulerFactory();
 			Scheduler scheduler = factory.getScheduler();
 			if (scheduler != null) {
@@ -72,7 +83,7 @@ public class CommandRunner implements CommandLineRunner {
 				}
 				JobDataMap jobMap = detail.getJobDataMap();
 				jobMap.put(JobRunner.SCHEDULE_KEY, job.getJobName());
-				jobMap.put(JobRunner.IMPORT_INTF,fileImportServiceIntf);
+				jobMap.put(JobRunner.IMPORT_INTF, fileImportServiceIntf);
 				scheduler.scheduleJob(detail, trigger);
 			}
 			scheduler.start();
@@ -81,30 +92,47 @@ public class CommandRunner implements CommandLineRunner {
 		}
 	}
 
-	/*
-	 * public void executeScriptsOnEmptySchema() { try { int usersCount =
-	 * loginServiceIntf.findUsersCount(); if (usersCount == 0) { Date
-	 * currentDate = new Date(); MenuGroup m = new MenuGroup();
-	 * m.setCreatedDate(currentDate); m.setGroupName("Company Managment");
-	 * MenuGroup m1 = menuGrpRepo.save(m); MenuItem mi = new MenuItem();
-	 * mi.setCreatedDate(currentDate); mi.setMenuGroup(m1);
-	 * mi.setMenuName("Company Info"); MenuItem mi1 = menuItemRepo.save(mi);
-	 * Role r = new Role(); r.setCreatedDate(currentDate);
-	 * r.setRoleName("Admin"); r.setDescription("Admin Role"); Role r1 =
-	 * roleRepo.save(r); RoleMenuItem rm = new RoleMenuItem();
-	 * rm.setMenuItem(mi1); rm.setRole(r1); roleMenuItemRepo.save(rm);
-	 * AESEncryption.init("t7GcYbbdbKxZtV2ge6qpeQ=="); Users users = new
-	 * Users(); users.setUserCode("100");
-	 * users.setPassword(AESEncryption.getInstance().encode("sysadmin#welcome"))
-	 * ; users.setUserName("sysadmin"); users.setRole(r);
-	 * users.setStatus("active"); userRepository.save(users);
-	 * ScheduleJobs jobs = new ScheduleJobs();
-		jobs.setCreatedDate(new Date());
-		jobs.setIntervalInSec(60);
-		jobs.setJobName("File Import");
-		jobs.setStatus("active");
-		scheduleRepo.save(jobs);
-	 * } } catch (Exception e) { e.printStackTrace(); } }
-	 */
+	public void executeScriptsOnEmptySchema() {
+		try {
+			int usersCount = loginServiceIntf.findUsersCount();
+			if (usersCount == 0) {
+				Date currentDate = new Date();
+				MenuGroup m = new MenuGroup();
+				m.setCreatedDate(currentDate);
+				m.setGroupName("Company Managment");
+				MenuGroup m1 = menuGrpRepo.save(m);
+				MenuItem mi = new MenuItem();
+				mi.setCreatedDate(currentDate);
+				mi.setMenuGroup(m1);
+				mi.setMenuName("Company Info");
+				MenuItem mi1 = menuItemRepo.save(mi);
+				Role r = new Role();
+				r.setCreatedDate(currentDate);
+				r.setRoleName("Admin");
+				r.setDescription("Admin Role");
+				Role r1 = roleRepo.save(r);
+				RoleMenuItem rm = new RoleMenuItem();
+				rm.setMenuItem(mi1);
+				rm.setRole(r1);
+				roleMenuItemRepo.save(rm);
+				AESEncryption.init();
+				Users users = new Users();
+				users.setUserCode("100");
+				users.setPassword(AESEncryption.getInstance().encode("sysadmin#welcome"));
+				users.setUserName("sysadmin");
+				users.setRole(r);
+				users.setStatus("active");
+				userRepository.save(users);
+				ScheduleJobs jobs = new ScheduleJobs();
+				jobs.setCreatedDate(new Date());
+				jobs.setIntervalInSec(60);
+				jobs.setJobName("File Import");
+				jobs.setStatus("active");
+				scheduleRepo.save(jobs);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 }

@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Table(name = "ROLE")
@@ -20,7 +21,9 @@ public class Role {
 
 	@Id
 	@Column(name = "ROLE_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO,generator = "seq_role")
+	@SequenceGenerator(allocationSize = 1,sequenceName = "seq_role",name = "seq_role")
+	
 	public Integer getRoleId() {
 		return roleId;
 	}

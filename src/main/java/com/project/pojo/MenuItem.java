@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -23,10 +24,12 @@ public class MenuItem {
 	private String menuName;
 	private Date createdDate;
 	private MenuGroup menuGroup;
+	private int menuOrder;
 
 	@Id
 	@Column(name = "MENU_ITEM_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "seq_menu_item")
+	@SequenceGenerator(allocationSize = 1, sequenceName = "seq_menu_item", name = "seq_menu_item")
 	public Integer getMenuItemId() {
 		return menuItemId;
 	}
@@ -53,9 +56,10 @@ public class MenuItem {
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
 	}
-    @JoinColumn(name="MENU_GROUP_ID")
-    @ManyToOne
-    @Fetch(FetchMode.JOIN)
+
+	@JoinColumn(name = "MENU_GROUP_ID")
+	@ManyToOne
+	@Fetch(FetchMode.JOIN)
 	public MenuGroup getMenuGroup() {
 		return menuGroup;
 	}
@@ -63,6 +67,14 @@ public class MenuItem {
 	public void setMenuGroup(MenuGroup menuGroup) {
 		this.menuGroup = menuGroup;
 	}
-	
+
+	@Column(name = "Menu_Order")
+	public int getMenuOrder() {
+		return menuOrder;
+	}
+
+	public void setMenuOrder(int menuOrder) {
+		this.menuOrder = menuOrder;
+	}
 
 }

@@ -11,6 +11,6 @@ import com.project.pojo.RoleMenuItem;
 
 @Repository
 public interface RoleMenuItemRepository extends CrudRepository<RoleMenuItem, Integer> {
-	@Query("from RoleMenuItem r where r.role.roleId=:Role")
+	@Query("from RoleMenuItem r where r.role.roleId=:Role order by r.menuItem.menuOrder")
 	public List<RoleMenuItem> fetchMenusByRole(@Param("Role") int roleId);
 }

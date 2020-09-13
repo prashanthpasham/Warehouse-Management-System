@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -18,7 +19,8 @@ public class Company {
 	private Integer decimalPoints;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO,generator = "seq_company_info")
+	@SequenceGenerator(allocationSize = 1,sequenceName = "seq_company_info",name = "seq_company_info")
 	@Column(name = "COMPANY_ID")
 	public Integer getCompanyId() {
 		return companyId;

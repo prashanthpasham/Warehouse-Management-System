@@ -1,7 +1,8 @@
 package com.project.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,8 +32,8 @@ public class UserController {
 	@Autowired
 	private LoginServiceInf loginServiceInf;
 
-	@PostMapping(value = "/validate")
-	public ResponseEntity<ObjectNode> loginValidation(@RequestBody String users) {
+	@PostMapping(value = "/authenticate",produces = "application/json")
+	public ResponseEntity<String> loginValidation(@RequestBody String users) {
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectNode node = mapper.createObjectNode();
 		ArrayNode menuGroups = mapper.createArrayNode();
@@ -42,6 +43,7 @@ public class UserController {
 			String status = "fail";
 			StringBuffer errorMsg = new StringBuffer();
 			if (map != null) {
+				System.out.println(map.toString());
 				if (map.get("userName") != null && map.get("userName").toString().trim().length() > 0) {
 					if (map.get("password") != null && map.get("password").toString().trim().length() > 0) {
 						// validating users credentials
@@ -55,8 +57,15 @@ public class UserController {
 						} else {
 							// Fetch menus based on user role
 							List<RoleMenuItem> roleMenus = loginServiceInf.fetchMenusByRole(user.getRole().getRoleId());
+                           Collections.sort(roleMenus,new Comparator<RoleMenuItem>() {
 
-							Map<String, ObjectNode> menuMap = new HashMap<String, ObjectNode>();
+							@Override
+							public int compare(RoleMenuItem o1, RoleMenuItem o2) {
+								// TODO Auto-generated method stub
+								return o1.getMenuItem().getMenuGroup().getMenuGroupOrder()-o2.getMenuItem().getMenuGroup().getMenuGroupOrder();
+							}
+						});
+							Map<String, ObjectNode> menuMap = new LinkedHashMap<String, ObjectNode>();
 							if (!roleMenus.isEmpty()) {
 								for (RoleMenuItem roleMenu : roleMenus) {
 									// Every has mapped menuitem
@@ -87,6 +96,10 @@ public class UserController {
 							}
 							errorMsg.append("");
 							status = "success";
+							ObjectNode itemNode = mapper.createObjectNode();
+							itemNode.put("userId", user.getUserId());
+							itemNode.put("userName", user.getUserName());
+							node.put("user",itemNode);
 						}
 					} else {
 						errorMsg.append("password must be required");
@@ -98,11 +111,12 @@ public class UserController {
 				node.put("error_message", errorMsg.toString());
 
 			}
-
+			
+          System.out.println("node>>"+node.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return new ResponseEntity(node, HttpStatus.OK);
+		return new ResponseEntity(node.toString(), HttpStatus.OK);
 
 	}
 }

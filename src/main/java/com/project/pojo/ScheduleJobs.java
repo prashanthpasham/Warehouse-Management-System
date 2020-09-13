@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -21,7 +22,8 @@ public class ScheduleJobs {
 
 	@Id
 	@Column(name = "SCHEDULE_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO,generator = "seq_schedule_jobs")
+	@SequenceGenerator(allocationSize = 1,sequenceName = "seq_schedule_jobs",name = "seq_schedule_jobs")
 	public Integer getScheduleId() {
 		return scheduleId;
 	}
