@@ -10,6 +10,11 @@ import java.util.Map.Entry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +28,7 @@ import com.project.pojo.MenuGroup;
 import com.project.pojo.MenuItem;
 import com.project.pojo.RoleMenuItem;
 import com.project.pojo.Users;
+import com.project.security.JwtTokenUtil;
 import com.project.service.intf.LoginServiceInf;
 import com.project.util.AESEncryption;
 
@@ -31,8 +37,13 @@ import com.project.util.AESEncryption;
 public class UserController {
 	@Autowired
 	private LoginServiceInf loginServiceInf;
-
-	@PostMapping(value = "/authenticate",produces = "application/json")
+	@Autowired
+	private JwtTokenUtil tokenUtil;
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	@Autowired
+    private BCryptPasswordEncoder encoder;
+	@PostMapping(value = "/authenticate", produces = "application/json")
 	public ResponseEntity<String> loginValidation(@RequestBody String users) {
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectNode node = mapper.createObjectNode();
@@ -47,7 +58,7 @@ public class UserController {
 				if (map.get("userName") != null && map.get("userName").toString().trim().length() > 0) {
 					if (map.get("password") != null && map.get("password").toString().trim().length() > 0) {
 						// validating users credentials
-						String password = map.get("userName").toString().trim() + "#"
+						String password = map.get("userName").toString().trim().toLowerCase() + "#"
 								+ map.get("password").toString().trim();
 						AESEncryption.init();
 						Users user = loginServiceInf.loginValidation(map.get("userName").toString().trim(),
@@ -55,16 +66,20 @@ public class UserController {
 						if (user == null) {
 							errorMsg.append("Bad credentials");
 						} else {
+							//authenticate(user.getUserName(), encoder.encode(map.get("password").toString().trim()));
+							String token = tokenUtil.generateToken(user.getUserName());
+							node.put("token", token);
 							// Fetch menus based on user role
 							List<RoleMenuItem> roleMenus = loginServiceInf.fetchMenusByRole(user.getRole().getRoleId());
-                           Collections.sort(roleMenus,new Comparator<RoleMenuItem>() {
+							Collections.sort(roleMenus, new Comparator<RoleMenuItem>() {
 
-							@Override
-							public int compare(RoleMenuItem o1, RoleMenuItem o2) {
-								// TODO Auto-generated method stub
-								return o1.getMenuItem().getMenuGroup().getMenuGroupOrder()-o2.getMenuItem().getMenuGroup().getMenuGroupOrder();
-							}
-						});
+								@Override
+								public int compare(RoleMenuItem o1, RoleMenuItem o2) {
+									// TODO Auto-generated method stub
+									return o1.getMenuItem().getMenuGroup().getMenuGroupOrder()
+											- o2.getMenuItem().getMenuGroup().getMenuGroupOrder();
+								}
+							});
 							Map<String, ObjectNode> menuMap = new LinkedHashMap<String, ObjectNode>();
 							if (!roleMenus.isEmpty()) {
 								for (RoleMenuItem roleMenu : roleMenus) {
@@ -99,7 +114,7 @@ public class UserController {
 							ObjectNode itemNode = mapper.createObjectNode();
 							itemNode.put("userId", user.getUserId());
 							itemNode.put("userName", user.getUserName());
-							node.put("user",itemNode);
+							node.put("user", itemNode);
 						}
 					} else {
 						errorMsg.append("password must be required");
@@ -111,12 +126,22 @@ public class UserController {
 				node.put("error_message", errorMsg.toString());
 
 			}
-			
-          System.out.println("node>>"+node.toString());
+
+			System.out.println("node>>" + node.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return new ResponseEntity(node.toString(), HttpStatus.OK);
 
+	}
+
+	private void authenticate(String username, String password) throws Exception {
+		try {
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		} catch (DisabledException e) {
+			throw new Exception("USER_DISABLED", e);
+		} catch (BadCredentialsException e) {
+			throw new Exception("INVALID_CREDENTIALS", e);
+		}
 	}
 }

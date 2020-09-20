@@ -13,4 +13,6 @@ public interface UserRepository extends CrudRepository<Users, Integer> {
 
 	@Query("select count(*) from Users u")
 	public int findUsersCount();
+	
+	public Users findByUserName(String username);
 }

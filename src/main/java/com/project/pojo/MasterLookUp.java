@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -16,7 +17,8 @@ public class MasterLookUp {
 	private String type;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_master")
+	@SequenceGenerator(allocationSize = 1,name = "seq_master",sequenceName = "seq_master_lookup")
 	@Column(name = "MASTER_ID")
 	public Integer getMasterId() {
 		return masterId;
