@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -20,9 +21,12 @@ public class BusinessTerritory {
 	private String bsIds;
 	private String bsNames;
 	private MasterLookUp masterLookUp;
+	private int parentId;
+	private String businessName;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_business")
+	@SequenceGenerator(allocationSize = 1,sequenceName = "seq_business_territory",name = "seq_business")
 	@Column(name = "BUSINESS_ID")
 	public Integer getBusinessId() {
 		return businessId;
@@ -60,5 +64,22 @@ public class BusinessTerritory {
 	public void setMasterLookUp(MasterLookUp masterLookUp) {
 		this.masterLookUp = masterLookUp;
 	}
+    @Column(name="PARENT_BUSINESS_ID")
+	public int getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(int parentId) {
+		this.parentId = parentId;
+	}
+	@Column(name="BUSINESS_NAME")
+	public String getBusinessName() {
+		return businessName;
+	}
+
+	public void setBusinessName(String businessName) {
+		this.businessName = businessName;
+	}
+	
 
 }

@@ -3,7 +3,9 @@ package com.project.service.intf;
 import java.util.List;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
+import com.project.pojo.BusinessTerritory;
 import com.project.pojo.MasterLookUp;
 import com.project.pojo.RoleMenuItem;
 import com.project.pojo.ScheduleJobs;
@@ -23,4 +25,16 @@ public interface LoginServiceInf {
 	public JSONArray fetchBusinessHierarchy(String type);
 
 	public Users getUserByName(String username);
+	
+	public MasterLookUp findByMasterLookupId(Integer id);
+	
+	public BusinessTerritory findByBusinessTerritoryId(Integer id);
+	
+	public int findBsNameinTerritory(String bsName,int parentId);
+
+	public String saveBusinessTerritory(BusinessTerritory territory);
+
+	public JSONArray fetchBusinessTerritory();
+	
+	public JSONObject getBusinessTerritoryByParentId(int parentId);
 }
