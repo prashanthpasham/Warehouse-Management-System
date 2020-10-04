@@ -37,7 +37,7 @@ public class BusinessController {
 				JSONObject ob = (JSONObject) array.get(k);
 				MasterLookUp lookUp = new MasterLookUp();
 				lookUp.setName(ob.get("name").toString());
-				lookUp.setType("BT");
+				lookUp.setType(obj.get("type").toString());
 				if (parentLookUp == null)
 					lookUp.setParentMasterId(0);
 				else if (ob.get("parent").toString().trim().length() > 0)

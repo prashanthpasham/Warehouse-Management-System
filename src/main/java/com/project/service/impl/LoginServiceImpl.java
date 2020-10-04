@@ -135,7 +135,7 @@ public class LoginServiceImpl implements LoginServiceInf {
 					obj.put("name", ld.getName());
 					obj.put("id", ld.getMasterId());
 					obj.put("parentId", ld.getParentMasterId());
-					obj.put("selectedValue", "0");
+					obj.put("selectedValue", ld.getMasterId()+"@0");
 					if (ld.getParentMasterId() > 0) {
 						Optional<MasterLookUp> lok = masterLookupRepo.findById(ld.getParentMasterId());
 						obj.put("parentName", lok.get().getName());

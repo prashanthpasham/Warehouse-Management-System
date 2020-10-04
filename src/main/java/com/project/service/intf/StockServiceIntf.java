@@ -1,0 +1,27 @@
+package com.project.service.intf;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import com.project.pojo.StockLookUp;
+import com.project.pojo.UOMConfiguration;
+
+public interface StockServiceIntf {
+
+	public int findByLookupName(String name, int parentId);
+
+	public StockLookUp findByStockLookupId(int parentId);
+
+	public String saveStockLookup(StockLookUp stock);
+
+	public JSONArray fetchStockLookup();
+
+	public JSONObject fetchStockLookupByParentId(int id);
+
+	public int findByUomName(String name);
+
+	public UOMConfiguration  findUomConfigById(int childId);
+
+	public String saveUomConfiguration(UOMConfiguration config);
+
+}

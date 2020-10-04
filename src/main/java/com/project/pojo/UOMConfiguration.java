@@ -16,9 +16,11 @@ import javax.persistence.TemporalType;
 public class UOMConfiguration {
 	private Integer uomConfigId;
 	private String uomName;
-	private String childUom;
-	private String childUOMId;
+	private String childUomIds;
+	private String childUomNames;
+	private int childUOMId;
 	private Date createdDate;
+	private int quantity;
 
 	@Id
 	@Column(name = "UOM_CONFIG_ID")
@@ -40,21 +42,28 @@ public class UOMConfiguration {
 		this.uomName = uomName;
 	}
 
+	@Column(name = "CHILD_UOM_IDS")
+	public String getChildUomIds() {
+		return childUomIds;
+	}
+
+	public void setChildUomIds(String childUomIds) {
+		this.childUomIds = childUomIds;
+	}
+
 	@Column(name = "CHILD_UOM")
-	public String getChildUom() {
-		return childUom;
+	public String getChildUomNames() {
+		return childUomNames;
 	}
 
-	public void setChildUom(String childUom) {
-		this.childUom = childUom;
+	public void setChildUomNames(String childUomNames) {
+		this.childUomNames = childUomNames;
 	}
-
 	@Column(name = "CHILD_UOM_ID")
-	public String getChildUOMId() {
+	public int getChildUOMId() {
 		return childUOMId;
 	}
-
-	public void setChildUOMId(String childUOMId) {
+	public void setChildUOMId(int childUOMId) {
 		this.childUOMId = childUOMId;
 	}
 
@@ -67,5 +76,14 @@ public class UOMConfiguration {
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
 	}
+	@Column(name = "QUANTITY")
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+	
 
 }

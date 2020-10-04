@@ -37,4 +37,5 @@ public interface LoginServiceInf {
 	public JSONArray fetchBusinessTerritory();
 	
 	public JSONObject getBusinessTerritoryByParentId(int parentId);
+
 }

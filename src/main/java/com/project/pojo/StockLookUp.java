@@ -17,9 +17,11 @@ import org.hibernate.annotations.FetchMode;
 @Table(name = "STOCK_LOOKUP")
 public class StockLookUp {
 	private Integer stockLookUpId;
+	private String name;
 	private String stockIds;
 	private String stockNames;
 	private MasterLookUp masterLookUp;
+	private StockLookUp parentId;
 
 	@Id
 	@Column(name = "Id")
@@ -30,6 +32,14 @@ public class StockLookUp {
 
 	public void setStockLookUpId(Integer stockLookUpId) {
 		this.stockLookUpId = stockLookUpId;
+	}
+	@Column(name = "NAME") 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Column(name = "STOCK_IDS")
@@ -60,5 +70,16 @@ public class StockLookUp {
 	public void setMasterLookUp(MasterLookUp masterLookUp) {
 		this.masterLookUp = masterLookUp;
 	}
+	@JoinColumn(name = "PARENT_ID")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@Fetch(FetchMode.JOIN)
+	public StockLookUp getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(StockLookUp parentId) {
+		this.parentId = parentId;
+	}
+	
 
 }
