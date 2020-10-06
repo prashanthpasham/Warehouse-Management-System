@@ -32,6 +32,10 @@ import com.project.security.JwtTokenUtil;
 import com.project.service.intf.LoginServiceInf;
 import com.project.util.AESEncryption;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping(value = "/login")
 public class UserController {
@@ -42,7 +46,11 @@ public class UserController {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 	@Autowired
-    private BCryptPasswordEncoder encoder;
+	private BCryptPasswordEncoder encoder;
+
+	@ApiOperation("To Authenticate users and grant jwt token")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Request Reached"),
+			@ApiResponse(code = 401, message = "Unauthorized") })
 	@PostMapping(value = "/authenticate", produces = "application/json")
 	public ResponseEntity<String> loginValidation(@RequestBody String users) {
 		ObjectMapper mapper = new ObjectMapper();
@@ -66,7 +74,8 @@ public class UserController {
 						if (user == null) {
 							errorMsg.append("Bad credentials");
 						} else {
-							//authenticate(user.getUserName(), encoder.encode(map.get("password").toString().trim()));
+							// authenticate(user.getUserName(),
+							// encoder.encode(map.get("password").toString().trim()));
 							String token = tokenUtil.generateToken(user.getUserName());
 							node.put("token", token);
 							// Fetch menus based on user role
@@ -144,4 +153,5 @@ public class UserController {
 			throw new Exception("INVALID_CREDENTIALS", e);
 		}
 	}
+	
 }

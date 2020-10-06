@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.project.pojo.UOMConfiguration;
 @Repository
 public interface UomConfigRepository extends CrudRepository<UOMConfiguration, Integer> {
-@Query("select count(*) from UomConfiguration a where lower(a.uomName)=:name")
+@Query("select count(*) from UOMConfiguration a where lower(a.uomName)=:name")
 	public int findByUomName(@Param("name") String name);
 
 }

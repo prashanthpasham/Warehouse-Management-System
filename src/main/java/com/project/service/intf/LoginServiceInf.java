@@ -5,6 +5,7 @@ import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.project.dto.RoleDto;
 import com.project.pojo.BusinessTerritory;
 import com.project.pojo.MasterLookUp;
 import com.project.pojo.RoleMenuItem;
@@ -37,5 +38,9 @@ public interface LoginServiceInf {
 	public JSONArray fetchBusinessTerritory();
 	
 	public JSONObject getBusinessTerritoryByParentId(int parentId);
+
+	public String saveRole(RoleDto dto);
+
+	public String editRole(RoleDto dto);
 
 }

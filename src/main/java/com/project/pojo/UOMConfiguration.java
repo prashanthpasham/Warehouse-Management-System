@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -24,7 +25,8 @@ public class UOMConfiguration {
 
 	@Id
 	@Column(name = "UOM_CONFIG_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_uom_config")
+	@SequenceGenerator(allocationSize = 1,sequenceName = "seq_uom_config",name = "seq_uom_config")
 	public Integer getUomConfigId() {
 		return uomConfigId;
 	}

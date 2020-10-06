@@ -1,5 +1,6 @@
 package com.project.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,11 +13,16 @@ import org.springframework.stereotype.Service;
 
 import com.project.dao.BusinessTerritoryRepository;
 import com.project.dao.MasterLookUpRepository;
+import com.project.dao.MenuItemRepository;
 import com.project.dao.RoleMenuItemRepository;
+import com.project.dao.RoleRepository;
 import com.project.dao.ScheduleJobsRepository;
 import com.project.dao.UserRepository;
+import com.project.dto.RoleDto;
+import com.project.dto.RoleMenuDto;
 import com.project.pojo.BusinessTerritory;
 import com.project.pojo.MasterLookUp;
+import com.project.pojo.Role;
 import com.project.pojo.RoleMenuItem;
 import com.project.pojo.ScheduleJobs;
 import com.project.pojo.Users;
@@ -35,6 +41,10 @@ public class LoginServiceImpl implements LoginServiceInf {
 	private MasterLookUpRepository masterLookupRepo;
 	@Autowired
 	private BusinessTerritoryRepository businessTerroritoryRepo;
+	@Autowired
+	private RoleRepository roleRepo;
+	@Autowired
+	private MenuItemRepository menuItemRepo;
 	public Users loginValidation(String userName, String password) {
 
 		return userRepository.findByUserNameAndPassword(userName, password);
@@ -205,5 +215,62 @@ public class LoginServiceImpl implements LoginServiceInf {
 		}
 		return ob;
 	}
+	public String saveRole(RoleDto dto) {
+		try {
+			Role role=roleRepo.findByRoleNameIgnoreCase(dto.getRoleName().toLowerCase());
+			if(role==null) {
+				Role r = new Role();
+				r.setRoleName(dto.getRoleName());
+				r.setCreatedDate(new Date());
+				r.setDescription(dto.getDescription());
+				Role rl =roleRepo.save(r);
+				for(RoleMenuDto menu:dto.getRoleMenus()) {
+					RoleMenuItem item = new RoleMenuItem();
+					item.setRole(rl);
+					item.setMenuItem(menuItemRepo.findById(menu.getMenuId()).get());
+					item.setAddOperation(menu.isAdd());
+					item.setEditOperation(menu.isEdit());
+					item.setDeleteOperation(menu.isDelete());
+					roleMenuRepo.save(item);
+				}
+				
+			}else {
+				return dto.getRoleName()+" already exist";
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
+		return "success";
+	}
+	public String editRole(RoleDto dto) {
+		try {
+			Role role=roleRepo.findByRoleNameIgnoreCase(dto.getRoleName().toLowerCase());
+			if(role==null || role.getRoleId()==dto.getId()) {
+				//delete all role menus
+				roleMenuRepo.deleteByRoleId(dto.getId());
+				Role rl =roleRepo.findById(dto.getId()).get();
+				rl.setRoleName(dto.getRoleName());
+				rl.setDescription(dto.getDescription());
+				roleRepo.save(rl);
+				for(RoleMenuDto menu:dto.getRoleMenus()) {
+					RoleMenuItem item = new RoleMenuItem();
+					item.setRole(rl);
+					item.setMenuItem(menuItemRepo.findById(menu.getMenuId()).get());
+					item.setAddOperation(menu.isAdd());
+					item.setEditOperation(menu.isEdit());
+					item.setDeleteOperation(menu.isDelete());
+					roleMenuRepo.save(item);
+				}
+			}else {
+				return dto.getRoleName()+" already exist";
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
+		return "success";
+	}
+	
 
 }
