@@ -18,8 +18,10 @@ import com.project.dao.RoleMenuItemRepository;
 import com.project.dao.RoleRepository;
 import com.project.dao.ScheduleJobsRepository;
 import com.project.dao.UserRepository;
+import com.project.dao.UsersRepository;
 import com.project.dto.RoleDto;
 import com.project.dto.RoleMenuDto;
+import com.project.dto.UsersDto;
 import com.project.pojo.BusinessTerritory;
 import com.project.pojo.MasterLookUp;
 import com.project.pojo.Role;
@@ -27,6 +29,7 @@ import com.project.pojo.RoleMenuItem;
 import com.project.pojo.ScheduleJobs;
 import com.project.pojo.Users;
 import com.project.service.intf.LoginServiceInf;
+import com.project.util.AESEncryption;
 
 @Service
 @Transactional
@@ -45,6 +48,8 @@ public class LoginServiceImpl implements LoginServiceInf {
 	private RoleRepository roleRepo;
 	@Autowired
 	private MenuItemRepository menuItemRepo;
+	@Autowired
+	private UsersRepository usersRepo;
 	public Users loginValidation(String userName, String password) {
 
 		return userRepository.findByUserNameAndPassword(userName, password);
@@ -271,6 +276,55 @@ public class LoginServiceImpl implements LoginServiceInf {
 		}
 		return "success";
 	}
-	
+
+	public String createUser(UsersDto dto) {
+		try {
+			List<Users> users = usersRepo.findByUserNameIgnoreCaseOrUserCode(dto.getUserName().toLowerCase(),
+					dto.getUserCode());
+			if (users != null && !users.isEmpty()) {
+				for (Users us : users) {
+					if (us.getUserId() != dto.getUserId()) {
+						if (us.getUserName().equalsIgnoreCase(dto.getUserName()))
+							return "UserName " + dto.getUserName() + " already exist";
+						else
+							return "User Code " + dto.getUserCode() + " already exist";
+					}
+				}
+			}
+				Users user = null;
+				if (dto.getUserId() != null && dto.getUserId() > 0) {
+					Optional<Users> us = usersRepo.findById(dto.getUserId());
+					if (us.isPresent()) {
+						user = us.get();
+						user.setModifiedDate(new Date());
+					}
+
+				} else {
+					user = new Users();
+					user.setCreatedDate(new Date());
+				}
+				if (user != null) {
+					user.setUserCode(dto.getUserCode());
+					user.setUserName(dto.getUserName());
+					user.setEmail(dto.getEmail());
+					user.setPhoneNo(dto.getPhoneNo());
+					user.setRole(roleRepo.findById(dto.getRoleId()).get());
+					user.setBusinessTerritory(businessTerroritoryRepo.findById(dto.getBusinessId()).get());
+					if (dto.getPassword() != null) {
+						AESEncryption.init();
+						user.setPassword(AESEncryption.getInstance()
+								.encode(dto.getUserName().toLowerCase() + "#" + dto.getPassword()));
+					}
+					user.setStatus(dto.getStatus() != null ? dto.getStatus() : "active");
+					usersRepo.save(user);
+				} else {
+					return "UserName " + dto.getUserName() + " doesn't exist";
+				}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
+		return "success";
+	}
 
 }

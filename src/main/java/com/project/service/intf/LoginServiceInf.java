@@ -6,6 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.project.dto.RoleDto;
+import com.project.dto.UsersDto;
 import com.project.pojo.BusinessTerritory;
 import com.project.pojo.MasterLookUp;
 import com.project.pojo.RoleMenuItem;
@@ -42,5 +43,7 @@ public interface LoginServiceInf {
 	public String saveRole(RoleDto dto);
 
 	public String editRole(RoleDto dto);
+
+	public String createUser(UsersDto dto);
 
 }

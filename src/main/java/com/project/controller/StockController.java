@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.dto.StockDto;
 import com.project.pojo.StockLookUp;
 import com.project.pojo.UOMConfiguration;
 import com.project.service.intf.LoginServiceInf;
@@ -96,7 +97,7 @@ public ResponseEntity<String> createUomConfiguration(@RequestBody String data) {
 			config.setChildUOMId(childId);
 			config.setQuantity(Integer.parseInt(obj.get("quantity").toString()));
 			String childs = name + "#" + config.getQuantity() + "@";
-			if (childId > 0) {
+			if (childId > 0 && uom!=null) {
 				config.setChildUomIds(uom.getChildUomIds());
 				config.setChildUomNames(uom.getChildUomNames() + childs);
 			} else {
@@ -112,6 +113,16 @@ public ResponseEntity<String> createUomConfiguration(@RequestBody String data) {
 		e.printStackTrace();
 	}
 	return ResponseEntity.ok(result);
+}
+@PostMapping(value = "/create-stock", consumes = "application/json")
+public String createStock(@RequestBody StockDto dto) {
+	String result="";
+	try {
+		result=stockServiceIntf.createStock(dto);
+	}catch (Exception e) {
+		e.printStackTrace();
+	}
+	return result;
 }
 
 

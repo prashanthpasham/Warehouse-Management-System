@@ -1,5 +1,7 @@
 package com.project.pojo;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -27,6 +29,9 @@ public class Users {
 	private Integer accessHierarchy;
 	private BusinessTerritory businessTerritory;
 	private Integer address;
+	private Date lastLoginTime;
+	private Date createdDate;
+	private Date modifiedDate;
 
 	@Id
 	@Column(name = "USER_ID")
@@ -124,5 +129,30 @@ public class Users {
 	public void setAddress(Integer address) {
 		this.address = address;
 	}
+	@Column(name = "LAST_LOGIN_TIME")
+	public Date getLastLoginTime() {
+		return lastLoginTime;
+	}
+
+	public void setLastLoginTime(Date lastLoginTime) {
+		this.lastLoginTime = lastLoginTime;
+	}
+	@Column(name = "CREATED_DATE")
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+	@Column(name = "MODIFIED_DATE")
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+	
 
 }

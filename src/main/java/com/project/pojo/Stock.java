@@ -34,6 +34,7 @@ public class Stock {
 	private String defaultPackSize;
 	private Double defaultPackQty;
 	private List<Images> images;
+	private StockLookUp stockLookup;
 
 	@Id
 	@Column(name = "STOCK_ID")
@@ -46,7 +47,7 @@ public class Stock {
 		this.stockId = stockId;
 	}
 
-	@Column(name = "SKU_CODE",unique=true)
+	@Column(name = "SKU_CODE", unique = true)
 	public String getSkuCode() {
 		return skuCode;
 	}
@@ -128,7 +129,8 @@ public class Stock {
 	public void setModifiedDate(Date modifiedDate) {
 		this.modifiedDate = modifiedDate;
 	}
-    @Column(name="DEFAULT_PACK_SIZE")
+
+	@Column(name = "DEFAULT_PACK_SIZE")
 	public String getDefaultPackSize() {
 		return defaultPackSize;
 	}
@@ -136,7 +138,8 @@ public class Stock {
 	public void setDefaultPackSize(String defaultPackSize) {
 		this.defaultPackSize = defaultPackSize;
 	}
-	 @Column(name="DEFAULT_PACK_QTY")
+
+	@Column(name = "DEFAULT_PACK_QTY")
 	public Double getDefaultPackQty() {
 		return defaultPackQty;
 	}
@@ -145,7 +148,7 @@ public class Stock {
 		this.defaultPackQty = defaultPackQty;
 	}
 
-	@OneToMany(cascade=CascadeType.ALL,fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "stockId")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "stockId")
 	@Fetch(FetchMode.SUBSELECT)
 	public List<Images> getImages() {
 		return images;
@@ -153,6 +156,16 @@ public class Stock {
 
 	public void setImages(List<Images> images) {
 		this.images = images;
+	}
+
+	@ManyToOne
+	@JoinColumn(name = "stock_lookup")
+	public StockLookUp getStockLookup() {
+		return stockLookup;
+	}
+
+	public void setStockLookup(StockLookUp stockLookup) {
+		this.stockLookup = stockLookup;
 	}
 
 }

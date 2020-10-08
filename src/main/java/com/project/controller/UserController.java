@@ -24,6 +24,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.project.dto.EmailDto;
+import com.project.dto.UsersDto;
 import com.project.pojo.MenuGroup;
 import com.project.pojo.MenuItem;
 import com.project.pojo.RoleMenuItem;
@@ -47,6 +49,8 @@ public class UserController {
 	private AuthenticationManager authenticationManager;
 	@Autowired
 	private BCryptPasswordEncoder encoder;
+	@Autowired
+	private EmailController emailController;
 
 	@ApiOperation("To Authenticate users and grant jwt token")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Request Reached"),
@@ -73,7 +77,7 @@ public class UserController {
 								AESEncryption.getInstance().encode(password));
 						if (user == null) {
 							errorMsg.append("Bad credentials");
-						} else {
+						} else if(user.getStatus().equalsIgnoreCase("active")){
 							// authenticate(user.getUserName(),
 							// encoder.encode(map.get("password").toString().trim()));
 							String token = tokenUtil.generateToken(user.getUserName());
@@ -124,6 +128,8 @@ public class UserController {
 							itemNode.put("userId", user.getUserId());
 							itemNode.put("userName", user.getUserName());
 							node.put("user", itemNode);
+						}else {
+							errorMsg.append("User is inactive");
 						}
 					} else {
 						errorMsg.append("password must be required");
@@ -152,6 +158,36 @@ public class UserController {
 		} catch (BadCredentialsException e) {
 			throw new Exception("INVALID_CREDENTIALS", e);
 		}
+	}
+	
+	@PostMapping(value = "/create-user",consumes = "application/json")
+	public String createUser(@RequestBody UsersDto dto) {
+		String result="";
+		try {
+			String pwd="AO_"+((int)(Math.random()*9000)+1000);
+			dto.setPassword(pwd);
+			 result=loginServiceInf.createUser(dto);
+			if(result.equals("success")) {
+				EmailDto email = new EmailDto();
+				email.setEmail(dto.getEmail());
+				email.setSubject("Login Credentials");
+				email.setBody("Hi,<br/>"+"UserName : "+dto.getUserName()+"<br/> Your  Password :"+pwd);
+				emailController.sendMailWithoutAttachement(email);
+			}
+		}catch (Exception e) {
+          e.printStackTrace();
+		}
+		return result;
+	}
+	@PostMapping(value = "/edit-user",consumes = "application/json")
+	public String editUser(@RequestBody UsersDto dto) {
+		String result="";
+		try {
+			 result=loginServiceInf.createUser(dto);
+		}catch (Exception e) {
+          e.printStackTrace();
+		}
+		return result;
 	}
 	
 }

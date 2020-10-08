@@ -1,5 +1,6 @@
 package com.project.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,8 +13,11 @@ import org.springframework.stereotype.Service;
 
 import com.project.dao.MasterLookUpRepository;
 import com.project.dao.StockLookUpRepository;
+import com.project.dao.StockRepository;
 import com.project.dao.UomConfigRepository;
+import com.project.dto.StockDto;
 import com.project.pojo.MasterLookUp;
+import com.project.pojo.Stock;
 import com.project.pojo.StockLookUp;
 import com.project.pojo.UOMConfiguration;
 import com.project.service.intf.StockServiceIntf;
@@ -27,7 +31,8 @@ public class StockServiceImpl implements StockServiceIntf {
 	private MasterLookUpRepository masterLookupRepo;
 	@Autowired
 	private UomConfigRepository uomConfigRepo;
-
+    @Autowired
+    private StockRepository stockRepo;
 	@Override
 	public int findByLookupName(String name, int parentId) {
 		// TODO Auto-generated method stub
@@ -37,7 +42,11 @@ public class StockServiceImpl implements StockServiceIntf {
 	@Override
 	public StockLookUp findByStockLookupId(int parentId) {
 		// TODO Auto-generated method stub
-		return stockLookupRepo.findById(parentId).get();
+		Optional<StockLookUp> opt =stockLookupRepo.findById(parentId);
+		if(opt.isPresent())
+		return opt.get();
+		else
+			return null;
 	}
 
 	@Override
@@ -140,14 +149,52 @@ public class StockServiceImpl implements StockServiceIntf {
 
 	@Override
 	public UOMConfiguration findUomConfigById(int id) {
-		// TODO Auto-generated method stub
-		return uomConfigRepo.findById(id).get();
+		Optional<UOMConfiguration> opt = uomConfigRepo.findById(id);
+		if (opt.isPresent())
+			return opt.get();
+		else
+			return null;
 	}
 
 	@Override
 	public String saveUomConfiguration(UOMConfiguration config) {
 		UOMConfiguration uom=uomConfigRepo.save(config);
 		uom.setChildUomIds(config.getChildUomIds()!=null?(config.getChildUomIds()+uom.getUomConfigId()+"@"):uom.getUomConfigId()+"@");
+		return "success";
+	}
+
+	@Override
+	public String createStock(StockDto dto) {
+		try {
+			List<Stock> stockList = stockRepo.findBySkuCodeIgnoreCase(dto.getSkuCode().toLowerCase());
+			if (stockList != null && !stockList.isEmpty()) {
+				return "SkuCode:" + dto.getSkuCode() + " already exist";
+			} else {
+				Stock stock = new Stock();
+				stock.setSkuCode(dto.getSkuCode());
+				stock.setSkuDescription(dto.getSkuDescription());
+				stock.setStatus(dto.getStatus());
+				stock.setCreatedDate(new Date());
+				stock.setManagedBy(dto.getManagedBy());
+				stock.setPrice(dto.getPrice());
+				stock.setUnitPrice(dto.getUnitPrice());
+				stock.setDefaultPackSize(dto.getDefaultPackSize());
+				stock.setDefaultPackQty(dto.getDefaultPackQty());
+				stock.setStockLookup(stockLookupRepo.findById(dto.getStockLookupId()).get());
+				stock.setUomConfigId(uomConfigRepo.findById(dto.getUomConfigId()).get());
+				/*
+				 * if (dto.getImages() != null && !dto.getImages().isEmpty()) { List<Images>
+				 * imgList = new ArrayList<Images>(); for (String img : dto.getImages()) {
+				 * Images image = new Images();
+				 * 
+				 * imgList.add(image); } stock.setImages(imgList); }
+				 */
+				stockRepo.save(stock);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
 		return "success";
 	}
 

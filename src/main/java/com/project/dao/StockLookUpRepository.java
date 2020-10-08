@@ -11,7 +11,7 @@ import com.project.pojo.StockLookUp;
 
 @Repository
 public interface StockLookUpRepository extends CrudRepository<StockLookUp, Integer> {
-	@Query("select count(*) from StockLookUp a where a.parentId=:parent and lower(a.name)=:name")
+	@Query("select count(*) from StockLookUp a where a.parentId.stockLookUpId=:parent and lower(a.name)=:name")
 	public int findByLookupName(@Param("name") String name, @Param("parent") int parentId);
 
 	@Query("from StockLookUp a where a.masterLookUp.masterId=:id")
