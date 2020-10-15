@@ -1,8 +1,10 @@
 package com.project.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javax.transaction.Transactional;
 
@@ -31,8 +33,9 @@ public class StockServiceImpl implements StockServiceIntf {
 	private MasterLookUpRepository masterLookupRepo;
 	@Autowired
 	private UomConfigRepository uomConfigRepo;
-    @Autowired
-    private StockRepository stockRepo;
+	@Autowired
+	private StockRepository stockRepo;
+
 	@Override
 	public int findByLookupName(String name, int parentId) {
 		// TODO Auto-generated method stub
@@ -42,9 +45,9 @@ public class StockServiceImpl implements StockServiceIntf {
 	@Override
 	public StockLookUp findByStockLookupId(int parentId) {
 		// TODO Auto-generated method stub
-		Optional<StockLookUp> opt =stockLookupRepo.findById(parentId);
-		if(opt.isPresent())
-		return opt.get();
+		Optional<StockLookUp> opt = stockLookupRepo.findById(parentId);
+		if (opt.isPresent())
+			return opt.get();
 		else
 			return null;
 	}
@@ -158,8 +161,9 @@ public class StockServiceImpl implements StockServiceIntf {
 
 	@Override
 	public String saveUomConfiguration(UOMConfiguration config) {
-		UOMConfiguration uom=uomConfigRepo.save(config);
-		uom.setChildUomIds(config.getChildUomIds()!=null?(config.getChildUomIds()+uom.getUomConfigId()+"@"):uom.getUomConfigId()+"@");
+		UOMConfiguration uom = uomConfigRepo.save(config);
+		uom.setChildUomIds(config.getChildUomIds() != null ? (config.getChildUomIds() + uom.getUomConfigId() + "@")
+				: uom.getUomConfigId() + "@");
 		return "success";
 	}
 
@@ -196,6 +200,104 @@ public class StockServiceImpl implements StockServiceIntf {
 			return "fail";
 		}
 		return "success";
+	}
+
+	@Override
+	public JSONObject stockList(int id) {
+		JSONObject obj = new JSONObject();
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+			Optional<Stock> opt = stockRepo.findById(id);
+			if (opt.isPresent()) {
+				Stock stock = opt.get();
+				obj.put("stockId", stock.getStockId());
+				obj.put("skuCode", stock.getSkuCode());
+				obj.put("skuDescription", stock.getSkuDescription());
+				obj.put("status", stock.getStatus());
+				obj.put("managedBy", stock.getManagedBy());
+				obj.put("createdDate", sdf.format(stock.getCreatedDate()));
+				obj.put("price", stock.getPrice());
+				obj.put("unitPrice", stock.getUnitPrice());
+				obj.put("uomConfigId", stock.getUomConfigId().getUomConfigId());
+				obj.put("defaultPackSize", stock.getDefaultPackSize());
+				obj.put("defaultPackQty", stock.getDefaultPackQty());
+				obj.put("stockLookupId", stock.getStockLookup().getStockLookUpId());
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return obj;
+	}
+
+	@Override
+	public JSONArray stockList() {
+		JSONArray results = new JSONArray();
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+			Iterable<Stock> it = stockRepo.findAll();
+			it.forEach(new Consumer<Stock>() {
+				@Override
+				public void accept(Stock stock) {
+
+					JSONObject obj = new JSONObject();
+					obj.put("stockId", stock.getStockId());
+					obj.put("skuCode", stock.getSkuCode());
+					obj.put("skuDescription", stock.getSkuDescription());
+					obj.put("status", stock.getStatus());
+					obj.put("managedBy", stock.getManagedBy());
+					obj.put("createdDate", sdf.format(stock.getCreatedDate()));
+					obj.put("modifiedDate", stock.getModifiedDate() != null ? sdf.format(stock.getModifiedDate()) : "");
+					results.add(obj);
+				}
+			});
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
+
+	@Override
+	public JSONArray uomConfigurationList() {
+		JSONArray results = new JSONArray();
+		try {
+			Iterable<UOMConfiguration> it = uomConfigRepo.findAll();
+			it.forEach(new Consumer<UOMConfiguration>() {
+				@Override
+				public void accept(UOMConfiguration uom) {
+					JSONObject obj = new JSONObject();
+					obj.put("id", uom.getUomConfigId());
+					obj.put("name", uom.getUomName());
+					obj.put("childUomId", uom.getChildUOMId());
+					obj.put("childUomIds", uom.getChildUomIds());
+					obj.put("childUomNames", uom.getChildUomNames());
+					results.add(obj);
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
+
+	@Override
+	public JSONObject uomConfigurationList(int configId) {
+		JSONObject obj = new JSONObject();
+		try {
+			Optional<UOMConfiguration> opt = uomConfigRepo.findById(configId);
+			if (opt.isPresent()) {
+				UOMConfiguration uom = opt.get();
+				obj.put("id", uom.getUomConfigId());
+				obj.put("name", uom.getUomName());
+				obj.put("childUomId", uom.getChildUOMId());
+				obj.put("childUomIds", uom.getChildUomIds());
+				obj.put("childUomNames", uom.getChildUomNames());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return obj;
 	}
 
 }

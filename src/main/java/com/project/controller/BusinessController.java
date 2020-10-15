@@ -38,10 +38,11 @@ public class BusinessController {
 				MasterLookUp lookUp = new MasterLookUp();
 				lookUp.setName(ob.get("name").toString());
 				lookUp.setType(obj.get("type").toString());
-				if (parentLookUp == null)
-					lookUp.setParentMasterId(0);
-				else if (ob.get("parent").toString().trim().length() > 0)
+				 if (parentLookUp!=null && ob.get("parent").toString().trim().length() > 0)
 					lookUp.setParentMasterId(parentLookUp.getMasterId());
+				 else
+					 lookUp.setParentMasterId(0);
+				
 				parentLookUp = loginServiceIntf.saveMasterLookUp(lookUp);
 
 			}

@@ -45,5 +45,7 @@ public interface LoginServiceInf {
 	public String editRole(RoleDto dto);
 
 	public String createUser(UsersDto dto);
+	
+	public JSONArray usersList(String code,String status,String name);
 
 }

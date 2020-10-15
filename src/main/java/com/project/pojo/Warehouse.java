@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -30,7 +31,8 @@ public class Warehouse {
 
 	@Id
 	@Column(name = "WAREHOUSE_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_warehouse")
+	@SequenceGenerator(allocationSize = 1,sequenceName = "seq_warehouse",name = "seq_warehouse")
 	public Integer getWarehouseId() {
 		return warehouseId;
 	}

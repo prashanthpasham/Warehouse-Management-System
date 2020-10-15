@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.project.pojo.Users;
 
 @Repository
-public interface UsersRepository extends CrudRepository<Users, Integer> {
-public List<Users> findByUserNameIgnoreCaseOrUserCode(String name,String code);
+public interface UsersRepository extends CrudRepository<Users, Integer>,UserCustomRepository {
+	public List<Users> findByUserNameIgnoreCaseOrUserCode(String name, String code);
+
 }

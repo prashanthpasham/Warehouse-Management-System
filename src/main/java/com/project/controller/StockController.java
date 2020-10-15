@@ -114,6 +114,14 @@ public ResponseEntity<String> createUomConfiguration(@RequestBody String data) {
 	}
 	return ResponseEntity.ok(result);
 }
+@GetMapping(value = "uom-list")
+public JSONArray uomConfigurationList() {
+	return stockServiceIntf.uomConfigurationList();
+}
+@GetMapping(value = "uom-list/{id}")
+public JSONObject uomConfigurationList(@PathVariable("id") String id) {
+	return stockServiceIntf.uomConfigurationList(Integer.parseInt(id));
+}
 @PostMapping(value = "/create-stock", consumes = "application/json")
 public String createStock(@RequestBody StockDto dto) {
 	String result="";
@@ -124,6 +132,15 @@ public String createStock(@RequestBody StockDto dto) {
 	}
 	return result;
 }
+@GetMapping(value = "/stock-list",produces="application/json")
+public JSONArray stockList() {
+	return stockServiceIntf.stockList();
+}
+@GetMapping(value = "/stock-list/{id}",produces="application/json")
+public JSONObject stockById(@PathVariable("id") String id) {
+	return stockServiceIntf.stockList(Integer.parseInt(id));
+}
+
 
 
 }

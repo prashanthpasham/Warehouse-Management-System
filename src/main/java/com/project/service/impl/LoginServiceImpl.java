@@ -3,11 +3,13 @@ package com.project.service.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javax.transaction.Transactional;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -325,6 +327,32 @@ public class LoginServiceImpl implements LoginServiceInf {
 			return "fail";
 		}
 		return "success";
+	}
+
+	@Override
+	public JSONArray usersList(String code,String status,String name) {
+		JSONArray results = new JSONArray();
+		try {
+			List<Object[]> users = usersRepo.findUsersList(code,status,name);
+		   if(!users.isEmpty()) {
+			   for(Object[] obj:users) {
+				   int i=0;
+				   JSONObject user= new JSONObject();
+				   user.put("userId", obj[i++].toString());
+				   user.put("userName", obj[i++].toString());
+				   user.put("userCode", obj[i++].toString());
+				   user.put("status", obj[i++].toString());
+				   user.put("createdDate", obj[i]!=null?obj[i].toString():"");
+				   i++;
+				   user.put("lastLoginTime", obj[i]!=null?obj[i].toString():"");
+				   i++;
+				   results.add(user);
+			   }
+		   }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
 	}
 
 }

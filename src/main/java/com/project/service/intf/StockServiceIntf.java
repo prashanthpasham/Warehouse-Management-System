@@ -27,4 +27,12 @@ public interface StockServiceIntf {
 
 	public String createStock(StockDto dto);
 
+	public JSONArray stockList();
+	
+	public JSONObject stockList(int id);
+
+	public JSONArray uomConfigurationList();
+
+	public JSONObject uomConfigurationList(int parseInt);
+
 }
