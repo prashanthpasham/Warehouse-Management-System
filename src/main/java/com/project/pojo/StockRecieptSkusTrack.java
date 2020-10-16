@@ -14,11 +14,11 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-@Table(name = "ORDER_ITEMS_TRACK")
+@Table(name = "STOCK_RECIEPT_SKUS_TRACK")
 @Entity
-public class OrderItemsTrack {
-	private Integer orderItemsId;
-	private OrderItems items;
+public class StockRecieptSkusTrack {
+	private Integer trackId;
+	private StockRecieptSkus stockRecieptSkus;
 	private String serialOrBatchNo;
 	private Double quantity;
 	private String pack;
@@ -26,26 +26,26 @@ public class OrderItemsTrack {
 	private String managedBy;
 
 	@Id
-	@Column(name = "ORDER_TRACK_ID")
-	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_order_items_track")
-	@SequenceGenerator(allocationSize = 1,name = "seq_order_items_track",sequenceName = "seq_order_items_track")
-	public Integer getOrderItemsId() {
-		return orderItemsId;
+	@Column(name = "TRACK_ID")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_STOCK_RECIEPT_SKUS_TRACK")
+	@SequenceGenerator(allocationSize = 1, name = "SEQ_STOCK_RECIEPT_SKUS_TRACK", sequenceName = "SEQ_STOCK_RECIEPT_SKUS_TRACK")
+	public Integer getTrackId() {
+		return trackId;
 	}
 
-	public void setOrderItemsId(Integer orderItemsId) {
-		this.orderItemsId = orderItemsId;
+	public void setTrackId(Integer trackId) {
+		this.trackId = trackId;
 	}
 
-	@JoinColumn(name = "ORDER_ITEMS_ID")
+	@JoinColumn(name = "STOCK_RECIEPT_SKUS")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@Fetch(FetchMode.JOIN)
-	public OrderItems getItems() {
-		return items;
+	public StockRecieptSkus getStockRecieptSkus() {
+		return stockRecieptSkus;
 	}
 
-	public void setItems(OrderItems items) {
-		this.items = items;
+	public void setStockRecieptSkus(StockRecieptSkus stockRecieptSkus) {
+		this.stockRecieptSkus = stockRecieptSkus;
 	}
 
 	@Column(name = "SERIAL_BATCH_NO")
@@ -92,5 +92,4 @@ public class OrderItemsTrack {
 	public void setManagedBy(String managedBy) {
 		this.managedBy = managedBy;
 	}
-
 }
