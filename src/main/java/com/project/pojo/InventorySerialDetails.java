@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -28,7 +29,8 @@ public class InventorySerialDetails {
 	private Date expireDate;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_inventory_serial_details")
+	@SequenceGenerator(allocationSize = 1,name = "seq_inventory_serial_details",sequenceName = "seq_inventory_serial_details")
 	@Column(name = "SERIAL_ID")
 	public Integer getSerialId() {
 		return serialId;

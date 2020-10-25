@@ -4,6 +4,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.project.dto.StockDto;
+import com.project.dto.StockRecieptDto;
 import com.project.pojo.StockLookUp;
 import com.project.pojo.UOMConfiguration;
 
@@ -34,5 +35,7 @@ public interface StockServiceIntf {
 	public JSONArray uomConfigurationList();
 
 	public JSONObject uomConfigurationList(int parseInt);
+
+	public String createStockReciept(StockRecieptDto dto);
 
 }

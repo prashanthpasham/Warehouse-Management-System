@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.dto.StockDto;
+import com.project.dto.StockRecieptDto;
 import com.project.pojo.StockLookUp;
+import com.project.pojo.StockReciept;
 import com.project.pojo.UOMConfiguration;
 import com.project.service.intf.LoginServiceInf;
 import com.project.service.intf.StockServiceIntf;
@@ -141,6 +143,15 @@ public JSONObject stockById(@PathVariable("id") String id) {
 	return stockServiceIntf.stockList(Integer.parseInt(id));
 }
 
-
+@PostMapping(value = "/stock-reciept", consumes = "application/json")
+public String createStockReciept(@RequestBody StockRecieptDto dto) {
+	String result="";
+	try {
+		result=stockServiceIntf.createStockReciept(dto);
+	}catch (Exception e) {
+		e.printStackTrace();
+	}
+	return result;
+}
 
 }

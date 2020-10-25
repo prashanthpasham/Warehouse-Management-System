@@ -1,31 +1,51 @@
 package com.project.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import javax.transaction.Transactional;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.project.dao.InventoryBatchRepository;
+import com.project.dao.InventorySerialRepository;
 import com.project.dao.MasterLookUpRepository;
 import com.project.dao.StockLookUpRepository;
+import com.project.dao.StockRecieptSkusRepository;
+import com.project.dao.StockRecieptSkusTrackRepository;
 import com.project.dao.StockRepository;
 import com.project.dao.UomConfigRepository;
+import com.project.dao.WarehouseInventoryDetailsRepository;
+import com.project.dao.WarehouseInventoryRepository;
+import com.project.dao.WarehouseRepository;
+import com.project.dto.SerialBatchDto;
 import com.project.dto.StockDto;
+import com.project.dto.StockRecieptDto;
+import com.project.dto.StockRecieptSkusDto;
+import com.project.pojo.InventoryBatchDetails;
+import com.project.pojo.InventorySerialDetails;
 import com.project.pojo.MasterLookUp;
 import com.project.pojo.Stock;
 import com.project.pojo.StockLookUp;
+import com.project.pojo.StockReciept;
+import com.project.pojo.StockRecieptSkus;
+import com.project.pojo.StockRecieptSkusTrack;
 import com.project.pojo.UOMConfiguration;
+import com.project.pojo.Warehouse;
+import com.project.pojo.WarehouseInventory;
+import com.project.pojo.WarehouseInventoryDetails;
 import com.project.service.intf.StockServiceIntf;
 
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 public class StockServiceImpl implements StockServiceIntf {
 	@Autowired
 	private StockLookUpRepository stockLookupRepo;
@@ -35,7 +55,20 @@ public class StockServiceImpl implements StockServiceIntf {
 	private UomConfigRepository uomConfigRepo;
 	@Autowired
 	private StockRepository stockRepo;
-
+	@Autowired
+	private WarehouseRepository warehouseRepo;
+    @Autowired
+    private StockRecieptSkusRepository stockRecieptSkusRepo;
+    @Autowired
+    private StockRecieptSkusTrackRepository stockRecieptTrackRepo;
+    @Autowired
+    private  WarehouseInventoryRepository warehouseInventoryRepo;
+    @Autowired
+    private WarehouseInventoryDetailsRepository warehouseInvDetRepo;
+    @Autowired
+    private  InventorySerialRepository inventorySerialRepo;
+    @Autowired
+    private InventoryBatchRepository inventoryBatchRepo;
 	@Override
 	public int findByLookupName(String name, int parentId) {
 		// TODO Auto-generated method stub
@@ -298,6 +331,113 @@ public class StockServiceImpl implements StockServiceIntf {
 			e.printStackTrace();
 		}
 		return obj;
+	}
+
+	@Override
+	public String createStockReciept(StockRecieptDto dto) {
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+			StockReciept reciept = new StockReciept();
+			reciept.setCreatedDate(new Date());
+			reciept.setSalesPerson(dto.getSalesPerson());
+			reciept.setWarehouse(warehouseRepo.findById(dto.getWarehouseId()).get());
+			List<WarehouseInventoryDetails> inventorySkus = new ArrayList<WarehouseInventoryDetails>();
+			for (StockRecieptSkusDto sku : dto.getSkus()) {
+				StockRecieptSkus stock = new StockRecieptSkus();
+				stock.setPack(sku.getPack());
+				stock.setPackQty(sku.getPackQty());
+				stock.setQuantity(sku.getQuantity());
+				Stock st=stockRepo.findById(sku.getStockId()).get();
+				stock.setStock(st);
+				stock.setStockReciept(reciept);
+				stockRecieptSkusRepo.save(stock);
+				WarehouseInventoryDetails det = new WarehouseInventoryDetails();
+				det.setStock(st);
+				det.setGoodQty(sku.getQuantity());
+				List<InventorySerialDetails> serialList = new ArrayList<InventorySerialDetails>();
+				List<InventoryBatchDetails> batchList = new ArrayList<InventoryBatchDetails>();
+				if(sku.getTrackDetails()!=null && sku.getTrackDetails().size()>0)
+				{
+					for (SerialBatchDto trackDto : sku.getTrackDetails()) {
+						StockRecieptSkusTrack track = new StockRecieptSkusTrack();
+						track.setStockRecieptSkus(stock);
+						track.setManagedBy(trackDto.getManagedBy());
+						track.setPack(trackDto.getPack());
+						track.setPackQty(trackDto.getQty());
+						track.setSerialOrBatchNo(trackDto.getBatchSerialNo());
+						stockRecieptTrackRepo.save(track);
+						if (trackDto.getManagedBy() != null) {
+							if (trackDto.getManagedBy().equalsIgnoreCase("serial")) {
+								InventorySerialDetails serial = new InventorySerialDetails();
+								serial.setCreatedDate(new Date());
+								serial.setExpireDate(sdf.parse(trackDto.getExpireDate()));
+								serial.setSerialNo(trackDto.getBatchSerialNo());
+								serial.setStatus("pending");
+								serial.setManfacturedDate(sdf.parse(trackDto.getManfactureDate()));
+								serialList.add(serial);
+							}
+							if (trackDto.getManagedBy().equalsIgnoreCase("batch")) {
+								InventoryBatchDetails batch = new InventoryBatchDetails();
+								batch.setAvailableQty(trackDto.getQty());
+								batch.setBatchNo(trackDto.getBatchSerialNo());
+								batch.setExpireDate(sdf.parse(trackDto.getExpireDate()));
+								batch.setManfactureDate(sdf.parse(trackDto.getManfactureDate()));
+								batchList.add(batch);
+							}
+						}
+					}
+				}
+				det.setInventorySerialList(serialList);
+				det.setInventoryBatchList(batchList);
+				inventorySkus.add(det);
+			}
+			return saveWarehouseInventory(reciept.getWarehouse(), inventorySkus);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "fail";
+		}
+	}
+	
+	public String saveWarehouseInventory(Warehouse warehouse,List<WarehouseInventoryDetails> inventorySkus) {
+		String result="";
+		try {
+			WarehouseInventory inventory = warehouseInventoryRepo.findByWarehouseId(warehouse.getWarehouseId());
+			if (inventory == null) {
+				inventory = new WarehouseInventory();
+				inventory.setCreatedDate(new Date());
+				inventory.setWarehouse(warehouse);
+			} else {
+				inventory.setModifiedDate(new Date());
+			}
+			for (WarehouseInventoryDetails skus : inventorySkus) {
+				WarehouseInventoryDetails details = warehouseInvDetRepo
+						.findByStockIdAndInventoryId(skus.getStock().getStockId(), inventory.getInventoryId());
+				if (details != null) {
+					details.setGoodQty(details.getGoodQty() + skus.getGoodQty());
+				} else {
+					details = skus;
+				}
+				details.setInventory(inventory);
+				warehouseInvDetRepo.save(details);
+				if (details.getInventorySerialList() != null && !details.getInventorySerialList().isEmpty()) {
+					for (InventorySerialDetails serial : details.getInventorySerialList()) {
+						serial.setInventoryDetails(details);
+						inventorySerialRepo.save(serial);
+					}
+				}
+				if (details.getInventoryBatchList() != null && !details.getInventoryBatchList().isEmpty()) {
+					for (InventoryBatchDetails batch : details.getInventoryBatchList()) {
+						batch.setInventoryDetails(details);
+						inventoryBatchRepo.save(batch);
+					}
+				}
+			}
+			result="success";
+		}catch (Exception e) {
+			e.printStackTrace();
+			result="fail";
+		}
+		return result;
 	}
 
 }

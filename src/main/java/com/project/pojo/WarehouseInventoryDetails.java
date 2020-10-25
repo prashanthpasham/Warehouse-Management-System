@@ -1,5 +1,7 @@
 package com.project.pojo;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,13 +9,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 @Entity
-@Table(name = "WAREHOUSE_INVENTORY")
+@Table(name = "WAREHOUSE_INVENTORY_DETAILS")
 public class WarehouseInventoryDetails {
 	private Integer detailsId;
 	private Stock stock;
@@ -21,10 +25,13 @@ public class WarehouseInventoryDetails {
 	private Double goodQty;
 	private Double damagedQty;
 	private Double returnQty;
+	private List<InventorySerialDetails> inventorySerialList;
+	private List<InventoryBatchDetails> inventoryBatchList;
 
 	@Id
 	@Column(name = "INVENTORY_DETAILS_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_wh_inevntory_details")
+	@SequenceGenerator(allocationSize = 1,name = "seq_wh_inevntory_details",sequenceName = "seq_wh_inevntory_details")
 	public Integer getDetailsId() {
 		return detailsId;
 	}
@@ -81,5 +88,22 @@ public class WarehouseInventoryDetails {
 	public void setReturnQty(Double returnQty) {
 		this.returnQty = returnQty;
 	}
+    @Transient
+	public List<InventorySerialDetails> getInventorySerialList() {
+		return inventorySerialList;
+	}
 
+	public void setInventorySerialList(List<InventorySerialDetails> inventorySerialList) {
+		this.inventorySerialList = inventorySerialList;
+	}
+	@Transient
+	public List<InventoryBatchDetails> getInventoryBatchList() {
+		return inventoryBatchList;
+	}
+
+	public void setInventoryBatchList(List<InventoryBatchDetails> inventoryBatchList) {
+		this.inventoryBatchList = inventoryBatchList;
+	}
+
+	
 }

@@ -8,7 +8,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.dao.BusinessTerritoryRepository;
 import com.project.dao.MasterLookUpRepository;
@@ -21,7 +22,8 @@ import com.project.pojo.Warehouse;
 import com.project.pojo.WarehouseUserMap;
 import com.project.service.intf.WarehouseServiceIntf;
 
-@Repository
+@Service
+@Transactional
 public class WarehouseServiceImpl implements WarehouseServiceIntf {
 	@Autowired
 	private WarehouseRepository warehouseRepo;
