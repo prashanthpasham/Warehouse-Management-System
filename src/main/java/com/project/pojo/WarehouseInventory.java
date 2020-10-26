@@ -9,13 +9,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 @Entity
-@Table(name = "WAREHOUSE_INVENTORY")
+@Table(name = "WAREHOUSE_INVENTORY_MASTER")
 public class WarehouseInventory {
 	private Integer inventoryId;
 	private Date createdDate;
@@ -24,7 +25,8 @@ public class WarehouseInventory {
 
 	@Id
 	@Column(name = "INVENTORY_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_wh_inventory")
+	@SequenceGenerator(allocationSize = 1,name = "seq_wh_inventory",sequenceName = "seq_wh_inventory")
 	public Integer getInventoryId() {
 		return inventoryId;
 	}

@@ -19,6 +19,7 @@ import com.project.dao.InventoryBatchRepository;
 import com.project.dao.InventorySerialRepository;
 import com.project.dao.MasterLookUpRepository;
 import com.project.dao.StockLookUpRepository;
+import com.project.dao.StockReceiptRepository;
 import com.project.dao.StockRecieptSkusRepository;
 import com.project.dao.StockRecieptSkusTrackRepository;
 import com.project.dao.StockRepository;
@@ -69,6 +70,8 @@ public class StockServiceImpl implements StockServiceIntf {
     private  InventorySerialRepository inventorySerialRepo;
     @Autowired
     private InventoryBatchRepository inventoryBatchRepo;
+    @Autowired
+    private StockReceiptRepository stockReceiptRepo;
 	@Override
 	public int findByLookupName(String name, int parentId) {
 		// TODO Auto-generated method stub
@@ -341,6 +344,7 @@ public class StockServiceImpl implements StockServiceIntf {
 			reciept.setCreatedDate(new Date());
 			reciept.setSalesPerson(dto.getSalesPerson());
 			reciept.setWarehouse(warehouseRepo.findById(dto.getWarehouseId()).get());
+			stockReceiptRepo.save(reciept);
 			List<WarehouseInventoryDetails> inventorySkus = new ArrayList<WarehouseInventoryDetails>();
 			for (StockRecieptSkusDto sku : dto.getSkus()) {
 				StockRecieptSkus stock = new StockRecieptSkus();
@@ -364,6 +368,7 @@ public class StockServiceImpl implements StockServiceIntf {
 						track.setManagedBy(trackDto.getManagedBy());
 						track.setPack(trackDto.getPack());
 						track.setPackQty(trackDto.getQty());
+						track.setQuantity(trackDto.getQty());
 						track.setSerialOrBatchNo(trackDto.getBatchSerialNo());
 						stockRecieptTrackRepo.save(track);
 						if (trackDto.getManagedBy() != null) {
@@ -402,6 +407,7 @@ public class StockServiceImpl implements StockServiceIntf {
 		String result="";
 		try {
 			WarehouseInventory inventory = warehouseInventoryRepo.findByWarehouseId(warehouse.getWarehouseId());
+			System.out.println("inventory1>>"+inventory);
 			if (inventory == null) {
 				inventory = new WarehouseInventory();
 				inventory.setCreatedDate(new Date());
@@ -409,9 +415,13 @@ public class StockServiceImpl implements StockServiceIntf {
 			} else {
 				inventory.setModifiedDate(new Date());
 			}
+			warehouseInventoryRepo.save(inventory);
 			for (WarehouseInventoryDetails skus : inventorySkus) {
-				WarehouseInventoryDetails details = warehouseInvDetRepo
+				WarehouseInventoryDetails details =null;
+				if(inventory.getInventoryId()!=null) {
+				details=warehouseInvDetRepo
 						.findByStockIdAndInventoryId(skus.getStock().getStockId(), inventory.getInventoryId());
+				}
 				if (details != null) {
 					details.setGoodQty(details.getGoodQty() + skus.getGoodQty());
 				} else {
