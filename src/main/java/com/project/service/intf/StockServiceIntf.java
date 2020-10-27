@@ -1,12 +1,17 @@
 package com.project.service.intf;
 
+import java.util.List;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.project.dto.SalesDto;
 import com.project.dto.StockDto;
 import com.project.dto.StockRecieptDto;
 import com.project.pojo.StockLookUp;
 import com.project.pojo.UOMConfiguration;
+import com.project.pojo.Warehouse;
+import com.project.pojo.WarehouseInventoryDetails;
 
 public interface StockServiceIntf {
 
@@ -37,5 +42,9 @@ public interface StockServiceIntf {
 	public JSONObject uomConfigurationList(int parseInt);
 
 	public String createStockReciept(StockRecieptDto dto);
+	
+	public String saveWarehouseInventory(Warehouse warehouse,List<WarehouseInventoryDetails> inventorySkus);
+
+	public String createSales(SalesDto sales);
 
 }

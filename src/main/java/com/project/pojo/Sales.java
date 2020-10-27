@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -31,7 +32,8 @@ public class Sales {
 
 	@Id
 	@Column(name = "SALES_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_sales")
+	@SequenceGenerator(allocationSize = 1,name = "seq_sales",sequenceName = "seq_sales")
 	public Integer getSalesId() {
 		return salesId;
 	}

@@ -8,13 +8,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-@Table(name = "SALES_ITEMS_TRACK")
 @Entity
+@Table(name = "SALES_ITEMS_TRACK")
 public class SalesItemsTrack {
 
 	private Integer salesTrackId;
@@ -26,8 +27,9 @@ public class SalesItemsTrack {
 	private String managedBy;
 
 	@Id
-	@Column(name = "ORDER_TRACK_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "SALES_TRACK_ID")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_sales_track")
+	@SequenceGenerator(allocationSize = 1,name = "seq_sales_track",sequenceName = "seq_sales_track")
 	public Integer getSalesTrackId() {
 		return salesTrackId;
 	}
@@ -36,7 +38,7 @@ public class SalesItemsTrack {
 		this.salesTrackId = salesTrackId;
 	}
 
-	@JoinColumn(name = "ORDER_ITEMS_ID")
+	@JoinColumn(name = "SALES_ITEMS_ID")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@Fetch(FetchMode.JOIN)
 	public SalesItems getItems() {

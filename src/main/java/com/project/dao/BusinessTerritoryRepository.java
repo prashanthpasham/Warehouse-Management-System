@@ -19,4 +19,6 @@ public interface BusinessTerritoryRepository extends CrudRepository<BusinessTerr
 	
 	@Query("from BusinessTerritory a where a.masterLookUp.masterId=:id")
 	public List<BusinessTerritory> getBusinessTerritoryByLookUpId(@Param("id") int id);
+
+	public BusinessTerritory findByBsIds(String businessId);
 }

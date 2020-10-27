@@ -27,6 +27,7 @@ import com.project.dao.UomConfigRepository;
 import com.project.dao.WarehouseInventoryDetailsRepository;
 import com.project.dao.WarehouseInventoryRepository;
 import com.project.dao.WarehouseRepository;
+import com.project.dto.SalesDto;
 import com.project.dto.SerialBatchDto;
 import com.project.dto.StockDto;
 import com.project.dto.StockRecieptDto;
@@ -34,6 +35,7 @@ import com.project.dto.StockRecieptSkusDto;
 import com.project.pojo.InventoryBatchDetails;
 import com.project.pojo.InventorySerialDetails;
 import com.project.pojo.MasterLookUp;
+import com.project.pojo.Sales;
 import com.project.pojo.Stock;
 import com.project.pojo.StockLookUp;
 import com.project.pojo.StockReciept;
@@ -448,6 +450,17 @@ public class StockServiceImpl implements StockServiceIntf {
 			result="fail";
 		}
 		return result;
+	}
+
+	@Override
+	public String createSales(SalesDto dto) {
+		try {
+		 	Sales sales = new Sales();
+		 	//sales.setCustomer();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

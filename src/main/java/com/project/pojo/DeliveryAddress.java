@@ -1,5 +1,7 @@
 package com.project.pojo;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -8,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -21,10 +24,12 @@ public class DeliveryAddress {
 	private String street;
 	private String zipCode;
 	private String city;
-	private Customer customerId;
+	private Customer customer;
+	private Date createdDate;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_delivery_address")
+	@SequenceGenerator(allocationSize = 1, name = "seq_delivery_address", sequenceName = "seq_delivery_address")
 	@Column(name = "ADDRESS_ID")
 	public Integer getAddressId() {
 		return addressId;
@@ -69,15 +74,24 @@ public class DeliveryAddress {
 	public void setCity(String city) {
 		this.city = city;
 	}
-    @ManyToOne(fetch=FetchType.LAZY)
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "CUSTOMER_ID")
-    @Fetch(FetchMode.JOIN)
-	public Customer getCustomerId() {
-		return customerId;
+	@Fetch(FetchMode.JOIN)
+	public Customer getCustomer() {
+		return customer;
 	}
 
-	public void setCustomerId(Customer customerId) {
-		this.customerId = customerId;
+	public void setCustomer(Customer customer) {
+		this.customer= customer;
+	}
+    @Column(name="Created_Date")
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
 	}
 
 }

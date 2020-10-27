@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -30,14 +31,13 @@ public class Customer {
 	private String email;
 	private String transactionType;
 	private Double creditLimit;
-	private Address address;
 	private BusinessTerritory businessTerritory;
 	private CustomerTypes customerTypes;
-	private List<DeliveryAddress> deliveryAddress;
 
 	@Id
 	@Column(name = "CUSTOMER_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "seq_customer")
+	@SequenceGenerator(allocationSize = 1,name = "seq_customer",sequenceName = "seq_customer")
 	public Integer getCustomerId() {
 		return customerId;
 	}
@@ -127,17 +127,6 @@ public class Customer {
 		this.creditLimit = creditLimit;
 	}
 
-	@JoinColumn(name = "ADDRESS_ID")
-	@ManyToOne(fetch = FetchType.LAZY)
-	@Fetch(FetchMode.JOIN)
-	public Address getAddress() {
-		return address;
-	}
-
-	public void setAddress(Address address) {
-		this.address = address;
-	}
-
 	@JoinColumn(name = "BUSINESS_TERRITORY")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@Fetch(FetchMode.JOIN)
@@ -158,15 +147,6 @@ public class Customer {
 
 	public void setCustomerTypes(CustomerTypes customerTypes) {
 		this.customerTypes = customerTypes;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "customerId")
-	public List<DeliveryAddress> getDeliveryAddress() {
-		return deliveryAddress;
-	}
-
-	public void setDeliveryAddress(List<DeliveryAddress> deliveryAddress) {
-		this.deliveryAddress = deliveryAddress;
 	}
 
 }
