@@ -47,4 +47,6 @@ public interface StockServiceIntf {
 
 	public String createSales(SalesDto sales);
 
+	public JSONArray salesList(JSONObject filters);
+
 }

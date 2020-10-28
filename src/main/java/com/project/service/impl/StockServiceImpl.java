@@ -9,25 +9,34 @@ import java.util.function.Consumer;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project.dao.CustomerRepository;
 import com.project.dao.InventoryBatchRepository;
 import com.project.dao.InventorySerialRepository;
 import com.project.dao.MasterLookUpRepository;
+import com.project.dao.SalesDaoIntf;
+import com.project.dao.SalesItemsRepository;
+import com.project.dao.SalesItemsTrackRepository;
+import com.project.dao.SalesRepository;
 import com.project.dao.StockLookUpRepository;
 import com.project.dao.StockReceiptRepository;
 import com.project.dao.StockRecieptSkusRepository;
 import com.project.dao.StockRecieptSkusTrackRepository;
 import com.project.dao.StockRepository;
 import com.project.dao.UomConfigRepository;
+import com.project.dao.UserRepository;
 import com.project.dao.WarehouseInventoryDetailsRepository;
 import com.project.dao.WarehouseInventoryRepository;
 import com.project.dao.WarehouseRepository;
 import com.project.dto.SalesDto;
+import com.project.dto.SalesItemsDto;
+import com.project.dto.SalesItemsTrackDto;
 import com.project.dto.SerialBatchDto;
 import com.project.dto.StockDto;
 import com.project.dto.StockRecieptDto;
@@ -36,6 +45,8 @@ import com.project.pojo.InventoryBatchDetails;
 import com.project.pojo.InventorySerialDetails;
 import com.project.pojo.MasterLookUp;
 import com.project.pojo.Sales;
+import com.project.pojo.SalesItems;
+import com.project.pojo.SalesItemsTrack;
 import com.project.pojo.Stock;
 import com.project.pojo.StockLookUp;
 import com.project.pojo.StockReciept;
@@ -60,20 +71,33 @@ public class StockServiceImpl implements StockServiceIntf {
 	private StockRepository stockRepo;
 	@Autowired
 	private WarehouseRepository warehouseRepo;
-    @Autowired
-    private StockRecieptSkusRepository stockRecieptSkusRepo;
-    @Autowired
-    private StockRecieptSkusTrackRepository stockRecieptTrackRepo;
-    @Autowired
-    private  WarehouseInventoryRepository warehouseInventoryRepo;
-    @Autowired
-    private WarehouseInventoryDetailsRepository warehouseInvDetRepo;
-    @Autowired
-    private  InventorySerialRepository inventorySerialRepo;
-    @Autowired
-    private InventoryBatchRepository inventoryBatchRepo;
-    @Autowired
-    private StockReceiptRepository stockReceiptRepo;
+	@Autowired
+	private StockRecieptSkusRepository stockRecieptSkusRepo;
+	@Autowired
+	private StockRecieptSkusTrackRepository stockRecieptTrackRepo;
+	@Autowired
+	private WarehouseInventoryRepository warehouseInventoryRepo;
+	@Autowired
+	private WarehouseInventoryDetailsRepository warehouseInvDetRepo;
+	@Autowired
+	private InventorySerialRepository inventorySerialRepo;
+	@Autowired
+	private InventoryBatchRepository inventoryBatchRepo;
+	@Autowired
+	private StockReceiptRepository stockReceiptRepo;
+	@Autowired
+	private CustomerRepository customerRepo;
+	@Autowired
+	private UserRepository userRepo;
+	@Autowired
+	private SalesRepository salesRepo;
+	@Autowired
+	private SalesItemsRepository salesItemsRepo;
+	@Autowired
+	private SalesItemsTrackRepository salesItemsTrackRepo;
+	@Autowired
+	private SalesDaoIntf salesDaoIntf;
+
 	@Override
 	public int findByLookupName(String name, int parentId) {
 		// TODO Auto-generated method stub
@@ -353,7 +377,7 @@ public class StockServiceImpl implements StockServiceIntf {
 				stock.setPack(sku.getPack());
 				stock.setPackQty(sku.getPackQty());
 				stock.setQuantity(sku.getQuantity());
-				Stock st=stockRepo.findById(sku.getStockId()).get();
+				Stock st = stockRepo.findById(sku.getStockId()).get();
 				stock.setStock(st);
 				stock.setStockReciept(reciept);
 				stockRecieptSkusRepo.save(stock);
@@ -362,8 +386,7 @@ public class StockServiceImpl implements StockServiceIntf {
 				det.setGoodQty(sku.getQuantity());
 				List<InventorySerialDetails> serialList = new ArrayList<InventorySerialDetails>();
 				List<InventoryBatchDetails> batchList = new ArrayList<InventoryBatchDetails>();
-				if(sku.getTrackDetails()!=null && sku.getTrackDetails().size()>0)
-				{
+				if (sku.getTrackDetails() != null && sku.getTrackDetails().size() > 0) {
 					for (SerialBatchDto trackDto : sku.getTrackDetails()) {
 						StockRecieptSkusTrack track = new StockRecieptSkusTrack();
 						track.setStockRecieptSkus(stock);
@@ -404,12 +427,12 @@ public class StockServiceImpl implements StockServiceIntf {
 			return "fail";
 		}
 	}
-	
-	public String saveWarehouseInventory(Warehouse warehouse,List<WarehouseInventoryDetails> inventorySkus) {
-		String result="";
+
+	public String saveWarehouseInventory(Warehouse warehouse, List<WarehouseInventoryDetails> inventorySkus) {
+		String result = "";
 		try {
 			WarehouseInventory inventory = warehouseInventoryRepo.findByWarehouseId(warehouse.getWarehouseId());
-			System.out.println("inventory1>>"+inventory);
+			System.out.println("inventory1>>" + inventory);
 			if (inventory == null) {
 				inventory = new WarehouseInventory();
 				inventory.setCreatedDate(new Date());
@@ -419,10 +442,10 @@ public class StockServiceImpl implements StockServiceIntf {
 			}
 			warehouseInventoryRepo.save(inventory);
 			for (WarehouseInventoryDetails skus : inventorySkus) {
-				WarehouseInventoryDetails details =null;
-				if(inventory.getInventoryId()!=null) {
-				details=warehouseInvDetRepo
-						.findByStockIdAndInventoryId(skus.getStock().getStockId(), inventory.getInventoryId());
+				WarehouseInventoryDetails details = null;
+				if (inventory.getInventoryId() != null) {
+					details = warehouseInvDetRepo.findByStockIdAndInventoryId(skus.getStock().getStockId(),
+							inventory.getInventoryId());
 				}
 				if (details != null) {
 					details.setGoodQty(details.getGoodQty() + skus.getGoodQty());
@@ -444,23 +467,108 @@ public class StockServiceImpl implements StockServiceIntf {
 					}
 				}
 			}
-			result="success";
-		}catch (Exception e) {
+			result = "success";
+		} catch (Exception e) {
 			e.printStackTrace();
-			result="fail";
+			result = "fail";
 		}
 		return result;
 	}
 
 	@Override
 	public String createSales(SalesDto dto) {
+		String result = "";
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 		try {
-		 	Sales sales = new Sales();
-		 	//sales.setCustomer();
-		}catch (Exception e) {
+			Sales sales = new Sales();
+			BeanUtils.copyProperties(dto, sales);
+			sales.setCustomer(customerRepo.findById(dto.getCustomerId()).get());
+			sales.setEntryDate(sdf.parse(dto.getEntryDate()));
+			sales.setSalesPerson(userRepo.findByUserName(dto.getSalesPersonName()));
+			Warehouse warehouse = warehouseRepo.findById(dto.getWarehouseId()).get();
+			sales.setWarehouse(warehouse);
+			salesRepo.save(sales);
+			List<WarehouseInventoryDetails> inventorySkus = new ArrayList<WarehouseInventoryDetails>();
+			if (dto.getItems() != null && !dto.getItems().isEmpty()) {
+				for (SalesItemsDto item : dto.getItems()) {
+					SalesItems items = new SalesItems();
+					BeanUtils.copyProperties(item, items);
+					Stock stock = stockRepo.findById(item.getStockId()).get();
+					items.setStock(stock);
+					items.setSales(sales);
+					salesItemsRepo.save(items);
+					WarehouseInventoryDetails det = new WarehouseInventoryDetails();
+					det.setStock(items.getStock());
+					det.setGoodQty(-item.getOrderQty());
+					List<InventorySerialDetails> serialList = new ArrayList<InventorySerialDetails>();
+					List<InventoryBatchDetails> batchList = new ArrayList<InventoryBatchDetails>();
+					if (item.getTrackDetails() != null && !item.getTrackDetails().isEmpty()) {
+						for (SerialBatchDto trackDto : item.getTrackDetails()) {
+							SalesItemsTrack track = new SalesItemsTrack();
+							track.setManagedBy(trackDto.getManagedBy());
+							track.setPack(trackDto.getPack());
+							track.setPackQty(trackDto.getPackQty());
+							track.setQuantity(trackDto.getQty());
+							track.setSerialOrBatchNo(trackDto.getBatchSerialNo());
+							track.setItems(items);
+							salesItemsTrackRepo.save(track);
+							if (trackDto.getManagedBy() != null) {
+								if (trackDto.getManagedBy().equalsIgnoreCase("serial")) {
+									InventorySerialDetails serial = inventorySerialRepo
+											.findBySerialNoAndStockId(stock.getStockId(), trackDto.getBatchSerialNo());
+									serial.setStatus("completed");
+									serialList.add(serial);
+								}
+								if (trackDto.getManagedBy().equalsIgnoreCase("batch")) {
+									InventoryBatchDetails batch = inventoryBatchRepo.findBatchDetailsBySkuAndBatchNo(
+											stock.getStockId(), trackDto.getBatchSerialNo());
+									batch.setAvailableQty(batch.getAvailableQty() - trackDto.getQty());
+									batchList.add(batch);
+								}
+
+							}
+						}
+
+					}
+					det.setInventorySerialList(serialList);
+					det.setInventoryBatchList(batchList);
+					inventorySkus.add(det);
+				}
+			}
+			return saveWarehouseInventory(warehouse, inventorySkus);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = "fail";
+		}
+		return result;
+	}
+
+	@Override
+	public JSONArray salesList(JSONObject filters) {
+		JSONArray results = new JSONArray();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+		try {
+			List<Sales> ls = salesDaoIntf.findSalesList(filters);
+			if (!ls.isEmpty()) {
+				for (Sales sale : ls) {
+					JSONObject obj = new JSONObject();
+					obj.put("salesId", sale.getSalesId());
+					obj.put("salesOrderNo", sale.getSalesOrderNo());
+					obj.put("entryDate", sdf.format(sale.getEntryDate()));
+					obj.put("customerName", sale.getCustomer().getCustomerName());
+					obj.put("customerCode", sale.getCustomer().getCustomerCode());
+					obj.put("warehouseCode", sale.getWarehouse().getWarehouseCode());
+					obj.put("warehouseName", sale.getWarehouse().getWarehouseName());
+					obj.put("totalPrice", sale.getTotalPrice());
+					obj.put("salesPerson", sale.getSalesPerson().getUserName());
+					obj.put("invoiceAmount", sale.getInvoiceAmount());
+					results.add(obj);
+				}
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return results;
 	}
 
 }

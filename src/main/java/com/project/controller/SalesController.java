@@ -1,5 +1,8 @@
 package com.project.controller;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +19,7 @@ import com.project.service.intf.StockServiceIntf;
 public class SalesController {
 	@Autowired
 	private StockServiceIntf stockServiceIntf;
-	
+
 	@PostMapping(value = "/create-sales", consumes = "application/json")
 	public ResponseEntity<String> createSales(@RequestBody SalesDto sales) {
 		String result = "";
@@ -29,5 +32,16 @@ public class SalesController {
 			e.printStackTrace();
 		}
 		return new ResponseEntity<String>(result, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/sales-list", consumes = "application/json", produces = "application/json")
+	public JSONArray salesList(@RequestBody String filters) {
+		try {
+			JSONObject obj = (JSONObject) new JSONParser().parse(filters);
+			return stockServiceIntf.salesList(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

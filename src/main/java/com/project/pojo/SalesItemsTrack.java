@@ -23,7 +23,7 @@ public class SalesItemsTrack {
 	private String serialOrBatchNo;
 	private Double quantity;
 	private String pack;
-	private Double packQty;
+	private int packQty;
 	private String managedBy;
 
 	@Id
@@ -77,11 +77,11 @@ public class SalesItemsTrack {
 	}
 
 	@Column(name = "PACK_QTY")
-	public Double getPackQty() {
+	public int getPackQty() {
 		return packQty;
 	}
 
-	public void setPackQty(Double packQty) {
+	public void setPackQty(int packQty) {
 		this.packQty = packQty;
 	}
 

@@ -6,7 +6,7 @@ public class SalesDto {
 	private String salesOrderNo;
 	private String status;
 	private String entryDate;
-	private String customerName;
+	private int customerId;
 	private int warehouseId;
 	private Double totalPrice;
 	private Double totalTax;
@@ -38,12 +38,13 @@ public class SalesDto {
 		this.entryDate = entryDate;
 	}
 
-	public String getCustomerName() {
-		return customerName;
+
+	public int getCustomerId() {
+		return customerId;
 	}
 
-	public void setCustomerName(String customerName) {
-		this.customerName = customerName;
+	public void setCustomerId(int customerId) {
+		this.customerId = customerId;
 	}
 
 	public int getWarehouseId() {

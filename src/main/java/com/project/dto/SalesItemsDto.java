@@ -8,7 +8,7 @@ public class SalesItemsDto {
 	private String pack;
 	private Double packQty;
 	private int salesId;
-    private List<SalesItemsTrackDto> trackDetails;
+    private List<SerialBatchDto> trackDetails;
 	public int getStockId() {
 		return stockId;
 	}
@@ -49,11 +49,11 @@ public class SalesItemsDto {
 		this.salesId = salesId;
 	}
 
-	public List<SalesItemsTrackDto> getTrackDetails() {
+	public List<SerialBatchDto> getTrackDetails() {
 		return trackDetails;
 	}
 
-	public void setTrackDetails(List<SalesItemsTrackDto> trackDetails) {
+	public void setTrackDetails(List<SerialBatchDto> trackDetails) {
 		this.trackDetails = trackDetails;
 	}
 	
