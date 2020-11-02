@@ -49,4 +49,6 @@ public interface StockServiceIntf {
 
 	public JSONArray salesList(JSONObject filters);
 
+	public JSONArray getSalesItemsById(int salesId);
+
 }

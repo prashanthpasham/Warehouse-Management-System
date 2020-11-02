@@ -6,6 +6,9 @@ import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +42,15 @@ public class SalesController {
 		try {
 			JSONObject obj = (JSONObject) new JSONParser().parse(filters);
 			return stockServiceIntf.salesList(obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	@GetMapping(value = "/sales-list/{id}", produces = "application/json")
+	public JSONArray salesItemsById(@PathVariable("id") int salesId) {
+		try {
+			return stockServiceIntf.getSalesItemsById(salesId);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

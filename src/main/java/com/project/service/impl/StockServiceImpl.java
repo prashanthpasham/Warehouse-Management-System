@@ -571,4 +571,40 @@ public class StockServiceImpl implements StockServiceIntf {
 		return results;
 	}
 
+	@Override
+	public JSONArray getSalesItemsById(int salesId) {
+		JSONArray results = new JSONArray();
+		try {
+			List<SalesItems> ls = salesItemsRepo.getSalesItemsById(salesId);
+			if (!ls.isEmpty()) {
+				for (SalesItems items : ls) {
+					List<SalesItemsTrack> details = salesItemsTrackRepo.findByItemsSalesItemsId(items.getSalesItemsId());
+					JSONObject item = new JSONObject();
+					item.put("skuCode", items.getStock().getSkuCode());
+					item.put("skuDescription", items.getStock().getSkuDescription());
+					item.put("orderQty", items.getOrderQty());
+					item.put("pack", items.getPack());
+					item.put("packQty", items.getPackQty());
+					JSONArray trackItems = new JSONArray();
+					if (!details.isEmpty()) {
+						for (SalesItemsTrack itemTrack : details) {
+							JSONObject track = new JSONObject();
+							track.put("serialBatchNo", itemTrack.getSerialOrBatchNo());
+							track.put("quantity", itemTrack.getQuantity());
+							track.put("managedBy", itemTrack.getManagedBy());
+							track.put("pack", itemTrack.getPack());
+							track.put("packQty", itemTrack.getPackQty());
+							trackItems.add(track);
+						}
+					}
+					item.put("trackItems", trackItems);
+					results.add(item);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
+
 }
