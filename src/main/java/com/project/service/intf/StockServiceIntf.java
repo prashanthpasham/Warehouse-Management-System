@@ -51,4 +51,6 @@ public interface StockServiceIntf {
 
 	public JSONArray getSalesItemsById(int salesId);
 
+	public JSONArray stockBalances(int warehouseId);
+
 }

@@ -607,4 +607,61 @@ public class StockServiceImpl implements StockServiceIntf {
 		return results;
 	}
 
+	@Override
+	public JSONArray stockBalances(int warehouseId) {
+		JSONArray results = new JSONArray();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+		try {
+			List<WarehouseInventoryDetails> details=warehouseInvDetRepo.findInventoryDetailsByWhId(warehouseId);
+			if (!details.isEmpty()) {
+				for (WarehouseInventoryDetails sku : details) {
+					JSONObject obj = new JSONObject();
+					Stock st = sku.getStock();
+					obj.put("skuCode", st.getSkuCode());
+					obj.put("SkuDesc", st.getSkuDescription());
+					obj.put("Qty", sku.getGoodQty());
+					obj.put("defaultPack", st.getDefaultPackSize());
+					obj.put("defaultPackQty", st.getDefaultPackQty());
+					obj.put("managedBy", st.getManagedBy() != null ? st.getManagedBy() : "");
+					JSONArray managedBy = new JSONArray();
+					if (st.getManagedBy() != null) {
+						if (st.getManagedBy().equals("serial")) {
+							List<InventorySerialDetails> serialList = inventorySerialRepo
+									.findSerialNoByInventoryId(sku.getDetailsId());
+							if (!serialList.isEmpty()) {
+								for (InventorySerialDetails serial : serialList) {
+									JSONObject ob = new JSONObject();
+									ob.put("batchSerialNo", serial.getSerialNo());
+									ob.put("manfacturedDate",
+											serial.getManfacturedDate() != null
+													? sdf.format(serial.getManfacturedDate())
+													: "");
+									ob.put("expireDate",
+											serial.getExpireDate() != null ? sdf.format(serial.getExpireDate()) : "");
+									managedBy.add(ob);
+								}
+							}
+						} else {
+                           List<InventoryBatchDetails> batchList=inventoryBatchRepo.findBatchByInventoryId(sku.getDetailsId());
+						   if(!batchList.isEmpty()) {
+							   for(InventoryBatchDetails batch:batchList) {
+								   JSONObject ob = new JSONObject();
+								   ob.put("batchSerialNo",batch.getBatchNo());
+								   ob.put("manfacturedDate",batch.getManfactureDate()!=null?batch.getManfactureDate():"");
+								   ob.put("expireDate", batch.getExpireDate()!=null?batch.getExpireDate():"");
+								   managedBy.add(ob);
+							   }
+						   }
+						}
+					}
+					obj.put("serialbatch", managedBy);
+					results.add(obj);
+				}
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
+
 }
