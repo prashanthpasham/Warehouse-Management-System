@@ -1,3 +1,4 @@
+
 package com.project.dao;
 
 import java.util.List;
@@ -15,4 +16,7 @@ public interface WarehouseInventoryDetailsRepository extends CrudRepository<Ware
 
 	@Query("from WarehouseInventoryDetails a where a.inventory.warehouse.warehouseId=?1")
 	public List<WarehouseInventoryDetails> findInventoryDetailsByWhId(int warehouseId);
+	
+	@Query("from WarehouseInventoryDetails a where a.inventory.warehouse.warehouseId=?1 and a.stock.stockId=?2 ")
+	public WarehouseInventoryDetails findInventoryByWhIdSkuId(int whId,int skuId);
 }

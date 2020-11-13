@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.dto.StockDto;
@@ -163,11 +164,32 @@ public class StockController {
 		return result;
 	}
 
-	@GetMapping(value = "/balance/{id}", consumes = "application/json")
+	@GetMapping(value = "/warehouse-balance/{id}", consumes = "application/json")
 	public JSONArray stockBalances(@PathVariable("id") int warehouseId) {
 		try {
 			return stockServiceIntf.stockBalances(warehouseId);
 		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	@GetMapping(value = "/warehouse-balance", consumes = "application/json")
+	public double warehouseBalanceBySku(@RequestParam("warehouseId") int whId,@RequestParam("skuId") int skuId)
+	{
+		try {
+			return stockServiceIntf.warehouseBalanceBySku(whId,skuId);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
+	@GetMapping(value = "/sku-serialbatch", consumes = "application/json")
+	public JSONArray skuBatchSerialByWarehouse(@RequestParam("warehouseId") int whId,@RequestParam("skuId") int skuId)
+	{
+		try {
+			return stockServiceIntf.serialBatchByWarehouseAndSku(whId,skuId);
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;

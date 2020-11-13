@@ -664,4 +664,58 @@ public class StockServiceImpl implements StockServiceIntf {
 		return results;
 	}
 
+	@Override
+	public double warehouseBalanceBySku(int whId, int skuId) {
+		try {
+			WarehouseInventoryDetails details=warehouseInvDetRepo.findInventoryByWhIdSkuId(whId, skuId);
+		    return details.getGoodQty();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	@Override
+	public JSONArray serialBatchByWarehouseAndSku(int whId, int skuId) {
+		JSONArray results = new JSONArray();
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+		try {
+		WarehouseInventoryDetails inventoryDetails=warehouseInvDetRepo.findInventoryByWhIdSkuId(whId, skuId);
+		if(inventoryDetails.getStock().equals("serial")) {
+
+			List<InventorySerialDetails> serialList = inventorySerialRepo
+					.findSerialNoByInventoryId(inventoryDetails.getDetailsId());
+			if (!serialList.isEmpty()) {
+				for (InventorySerialDetails serial : serialList) {
+					JSONObject ob = new JSONObject();
+					ob.put("batchSerialNo", serial.getSerialNo());
+					ob.put("manfacturedDate",
+							serial.getManfacturedDate() != null
+									? sdf.format(serial.getManfacturedDate())
+									: "");
+					ob.put("expireDate",
+							serial.getExpireDate() != null ? sdf.format(serial.getExpireDate()) : "");
+					results.add(ob);
+				}
+			}
+		
+		}else {
+            List<InventoryBatchDetails> batchList=inventoryBatchRepo.findBatchByInventoryId(inventoryDetails.getDetailsId());
+			   if(!batchList.isEmpty()) {
+				   for(InventoryBatchDetails batch:batchList) {
+					   JSONObject ob = new JSONObject();
+					   ob.put("batchSerialNo",batch.getBatchNo());
+					   ob.put("manfacturedDate",batch.getManfactureDate()!=null?batch.getManfactureDate():"");
+					   ob.put("expireDate", batch.getExpireDate()!=null?batch.getExpireDate():"");
+					   results.add(ob);
+				   }
+			   }
+			
+		}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
+
 }

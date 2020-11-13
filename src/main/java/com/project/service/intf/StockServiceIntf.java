@@ -53,4 +53,8 @@ public interface StockServiceIntf {
 
 	public JSONArray stockBalances(int warehouseId);
 
+	public double warehouseBalanceBySku(int whId, int skuId);
+
+	public JSONArray serialBatchByWarehouseAndSku(int whId, int skuId);
+
 }
