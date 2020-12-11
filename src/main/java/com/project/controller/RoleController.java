@@ -1,8 +1,10 @@
 package com.project.controller;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,5 +36,16 @@ public class RoleController {
 			e.printStackTrace();
 		}
 		return "fail";
+	}
+	@PostMapping(consumes = "application/json", value = "/role-list")
+	public JSONArray roleList(@RequestBody String dto) {
+		JSONArray results = new JSONArray();
+		try {
+			JSONObject filters = (JSONObject) new JSONParser().parse(dto);
+			results = loginServiceIntf.roleList(filters);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
 	}
 }

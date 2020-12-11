@@ -10,6 +10,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,17 +56,18 @@ public class CustomerController {
 	}
 
 	@PostMapping(value = "/create-customer", consumes = "application/json", produces = "text/plain")
-	public ResponseEntity<String> createCustomer(@RequestBody CustomerDto dto) {
+	public String createCustomer(@RequestBody CustomerDto dto) {
 		String result = "";
 		try {
 			result = customerServiceIntf.createCustomer(dto);
-			if (result.equals("success")) {
+			/*if (result.equals("success")) {
 				return new ResponseEntity<String>(result, HttpStatus.CREATED);
-			}
+			}*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return new ResponseEntity<String>(result, HttpStatus.OK);
+		//return new ResponseEntity<String>(result, HttpStatus.OK);
+		return result;
 	}
 
 	@PostMapping(value = "/customers", consumes = "application/json", produces = "application/json")

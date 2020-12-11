@@ -20,7 +20,7 @@ public class JwtTokenUtil implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Value("${jwtkey}")
 	private String secret;
-	private final int JWT_TOKEN_VALIDITY = 3600;
+	private final int JWT_TOKEN_VALIDITY = 7200;
 
 	private Claims getAllClaimsFromToken(String token) {
 		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();

@@ -30,23 +30,28 @@ public class BusinessController {
 		String result = "";
 		try {
 			JSONParser parser = new JSONParser();
-			JSONObject obj = (JSONObject) parser.parse(data);
-			JSONArray array = (JSONArray) obj.get("hierarchy");
-			MasterLookUp parentLookUp = null;
-			for (int k = 0; k < array.size(); k++) {
-				JSONObject ob = (JSONObject) array.get(k);
+			JSONObject ob = (JSONObject) parser.parse(data);
+			//JSONArray array = (JSONArray) obj.get("hierarchy");
+			
+			//for (int k = 0; k < array.size(); k++) {
+				//JSONObject ob = (JSONObject) array.get(k);
 				MasterLookUp lookUp = new MasterLookUp();
 				lookUp.setName(ob.get("name").toString());
-				lookUp.setType(obj.get("type").toString());
-				 if (parentLookUp!=null && ob.get("parent").toString().trim().length() > 0)
-					lookUp.setParentMasterId(parentLookUp.getMasterId());
+				lookUp.setType(ob.get("type").toString());
+				 if (ob.get("parent")!=null && ob.get("parent").toString().trim().length() > 0)
+					lookUp.setParentMasterId(Integer.parseInt(ob.get("parent").toString()));
 				 else
 					 lookUp.setParentMasterId(0);
-				
-				parentLookUp = loginServiceIntf.saveMasterLookUp(lookUp);
+				 int count = loginServiceIntf.findMasterLookupParentId(ob.get("type").toString(),lookUp.getParentMasterId());
+				  if(count==0){
+				    loginServiceIntf.saveMasterLookUp(lookUp);
+				    result = "success";
+				  }else{
+					  result = ob.get("name").toString() +" already exist in parent hierarchy";
+				  }
 
-			}
-			result = "success";
+			//}
+			
 		} catch (Exception e) {
 			result = "failure";
 			e.printStackTrace();
@@ -96,21 +101,23 @@ public class BusinessController {
 		return ResponseEntity.ok(result);
 	}
 	@GetMapping(value = "/business-territory", produces = "application/json")
-	public JSONArray fetchBusinessTerritory() {
+	public JSONArray fetchBusinessTerritory(@RequestParam("type") String type) {
 		JSONArray array = new JSONArray();
 		try {
-			array = loginServiceIntf.fetchBusinessTerritory();
+			System.out.println("type>>"+type);
+			array = loginServiceIntf.fetchBusinessTerritory(type);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("bt>>"+array.toJSONString());
 		return array;
 
 	}
-	@GetMapping(value = "/business-territory/{id}", produces = "application/json")
-	public JSONObject fetchBusinessTerritoryById(@PathVariable("id") String id) {
+	@GetMapping(value = "/business-territory-data", produces = "application/json")
+	public JSONObject fetchBusinessTerritoryById(@RequestParam("id") String id,@RequestParam("type") String type) {
 		JSONObject obj = new JSONObject();
 		try {
-		  obj = loginServiceIntf.getBusinessTerritoryByParentId(Integer.parseInt(id));
+		  obj = loginServiceIntf.getBusinessTerritoryByParentId(Integer.parseInt(id),type);
 		  System.out.println("obj>>"+obj.toJSONString());
 		} catch (Exception e) {
 			e.printStackTrace();

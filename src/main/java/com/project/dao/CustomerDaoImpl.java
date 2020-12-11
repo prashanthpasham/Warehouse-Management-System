@@ -37,7 +37,7 @@ public class CustomerDaoImpl implements CustomerDaoIntf {
 					sql += " and c.status='" + filters.get("status").toString().trim() + "'";
 				}
 				if (filters.get("customerType") != null && filters.get("customerType").toString().trim().length() > 0) {
-					sql += " and c.customerTypes in ( :types)";
+					sql += " and c.customerTypes.customerTypeId in ( "+ filters.get("customerType").toString().trim()+")";
 				}
 				if (filters.get("bsIds") != null && filters.get("bsIds").toString().trim().length() > 0) {
 					sql += " and c.businessTerritory.bsIds like '" + filters.get("bsIds").toString().trim() + "%' ";
@@ -45,9 +45,7 @@ public class CustomerDaoImpl implements CustomerDaoIntf {
 			}
 			Query qry = entityManager.createQuery(sql);
 			if (filters != null) {
-				if (filters.get("customerType") != null && filters.get("customerType").toString().trim().length() > 0) {
-					qry.setParameter("types", filters.get("customerType").toString().trim());
-				}
+				
 				if (filters.get("first") != null)
 					qry.setFirstResult(Integer.parseInt(filters.get("first").toString()) - 1);
 				if (filters.get("size") != null)

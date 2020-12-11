@@ -36,9 +36,9 @@ public interface LoginServiceInf {
 
 	public String saveBusinessTerritory(BusinessTerritory territory);
 
-	public JSONArray fetchBusinessTerritory();
+	public JSONArray fetchBusinessTerritory(String type);
 	
-	public JSONObject getBusinessTerritoryByParentId(int parentId);
+	public JSONObject getBusinessTerritoryByParentId(int parentId, String type);
 
 	public String saveRole(RoleDto dto);
 
@@ -47,5 +47,11 @@ public interface LoginServiceInf {
 	public String createUser(UsersDto dto);
 	
 	public JSONArray usersList(String code,String status,String name);
+
+	public JSONArray roleList(JSONObject filters);
+	
+	public JSONObject roleMenus(int roleId);
+
+	public int findMasterLookupParentId(String type,int parentMasterId);
 
 }

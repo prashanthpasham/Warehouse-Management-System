@@ -1,12 +1,20 @@
 package com.project.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +31,8 @@ import com.project.dto.RoleMenuDto;
 import com.project.dto.UsersDto;
 import com.project.pojo.BusinessTerritory;
 import com.project.pojo.MasterLookUp;
+import com.project.pojo.MenuGroup;
+import com.project.pojo.MenuItem;
 import com.project.pojo.Role;
 import com.project.pojo.RoleMenuItem;
 import com.project.pojo.ScheduleJobs;
@@ -107,7 +117,7 @@ public class LoginServiceImpl implements LoginServiceInf {
 	public MasterLookUp findByMasterLookupId(Integer id) {
 		// TODO Auto-generated method stub
 		Optional<MasterLookUp> ld=masterLookupRepo.findById(id);
-		return ld.get();
+		return ld.isPresent()?ld.get():null;
 	}
 
 	@Override
@@ -138,7 +148,7 @@ public class LoginServiceImpl implements LoginServiceInf {
 	}
 
 	@Override
-	public JSONArray fetchBusinessTerritory() {
+	public JSONArray fetchBusinessTerritory(String type) {
 		JSONArray results = new JSONArray();
 		try {
 			List<MasterLookUp> ls = masterLookupRepo.fetchBusinessHierarchy("BT");
@@ -149,7 +159,7 @@ public class LoginServiceImpl implements LoginServiceInf {
 					obj.put("name", ld.getName());
 					obj.put("id", ld.getMasterId());
 					obj.put("parentId", ld.getParentMasterId());
-					obj.put("selectedValue", ld.getMasterId()+"@0");
+					obj.put("selectedValue", ld.getMasterId()+("all".equalsIgnoreCase(type)?"@0":"@-1"));
 					if (ld.getParentMasterId() > 0) {
 						Optional<MasterLookUp> lok = masterLookupRepo.findById(ld.getParentMasterId());
 						obj.put("parentName", lok.get().getName());
@@ -159,8 +169,8 @@ public class LoginServiceImpl implements LoginServiceInf {
 							JSONObject item1 = new JSONObject();
 							item1.put("id", 0);
 							item1.put("parentId", 0);
-							item1.put("name", "All");
-							item1.put("bsid", ld.getMasterId()+"@0");
+							item1.put("name", "all".equalsIgnoreCase(type)?"All":"Select");
+							item1.put("bsid", ld.getMasterId()+("all".equalsIgnoreCase(type)?"@0":"@-1"));
 							items.add(item1);
 							for (BusinessTerritory bt : bs) {
 								JSONObject item = new JSONObject();
@@ -185,7 +195,7 @@ public class LoginServiceImpl implements LoginServiceInf {
 	public List<BusinessTerritory> getBusinessTerritoryByLookUpId(int id){
 		return businessTerroritoryRepo.getBusinessTerritoryByLookUpId(id);
 	}
-	public JSONObject getBusinessTerritoryByParentId(int parentId){
+	public JSONObject getBusinessTerritoryByParentId(int parentId,String type){
 		JSONObject ob = new JSONObject();
 		JSONArray results = new JSONArray();
 		try {
@@ -197,8 +207,8 @@ public class LoginServiceImpl implements LoginServiceInf {
 					JSONObject item1 = new JSONObject();
 					item1.put("id", 0);
 					item1.put("parentId", 0);
-					item1.put("name", "All");
-					item1.put("bsid", bt.getMasterLookUp().getMasterId()+"@0");
+					item1.put("name", "all".equalsIgnoreCase(type)?"All":"select");
+					item1.put("bsid", bt.getMasterLookUp().getMasterId()+("all".equalsIgnoreCase(type)?"@0":"@-1"));
 					results.add(item1);
 				}
 				JSONObject obj = new JSONObject();
@@ -350,6 +360,92 @@ public class LoginServiceImpl implements LoginServiceInf {
 			e.printStackTrace();
 		}
 		return results;
+	}
+
+	@Override
+	public JSONArray roleList(JSONObject filters) {
+		JSONArray results = new JSONArray();
+		try {
+
+			Pageable page = PageRequest.of(Integer.parseInt(filters.get("first").toString()),
+					Integer.parseInt(filters.get("size").toString()));
+			List<Role> list = roleRepo.fetchRoleList(page);
+			if (!list.isEmpty()) {
+				SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+				for (Role role : list) {
+					JSONObject obj = new JSONObject();
+					obj.put("roleId", role.getRoleId());
+					obj.put("roleName", role.getRoleName());
+					obj.put("description", role.getDescription());
+					obj.put("createdDate", role.getCreatedDate() != null ? sdf.format(role.getCreatedDate()) : "");
+					results.add(obj);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
+	@Override
+	public JSONObject roleMenus(int roleId) {
+		JSONObject node = new JSONObject();
+		JSONArray menuGroups = new JSONArray();
+		try {
+			List<RoleMenuItem> roleMenus = fetchMenusByRole(roleId);
+			Collections.sort(roleMenus, new Comparator<RoleMenuItem>() {
+
+				@Override
+				public int compare(RoleMenuItem o1, RoleMenuItem o2) {
+					// TODO Auto-generated method stub
+					return o1.getMenuItem().getMenuGroup().getMenuGroupOrder()
+							- o2.getMenuItem().getMenuGroup().getMenuGroupOrder();
+				}
+			});
+
+			Map<String, JSONObject> menuMap = new LinkedHashMap<String, JSONObject>();
+			if (!roleMenus.isEmpty()) {
+				for (RoleMenuItem roleMenu : roleMenus) {
+					// Every has mapped menuitem
+					MenuItem menuItem = roleMenu.getMenuItem();
+					MenuGroup menuGroup = menuItem.getMenuGroup();
+					String key = menuGroup.getGroupName();
+					JSONArray menuItems = null;
+					JSONObject grpNode = null;
+					if (menuMap.containsKey(key)) {
+						grpNode = menuMap.get(key);
+						menuItems = (JSONArray) grpNode.get("menuLinks");
+					} else {
+						grpNode = new JSONObject();
+						grpNode.put("groupName", menuGroup.getGroupName());
+						menuItems = new JSONArray();
+					}
+					JSONObject itemNode = new JSONObject();
+					itemNode.put("menuItemId", menuItem.getMenuItemId());
+					itemNode.put("menuItem", menuItem.getMenuName());
+					menuItems.add(itemNode);
+					grpNode.put("menuLinks", menuItems);
+					menuMap.put(key, grpNode);
+				}
+				for (Entry<String, JSONObject> grp : menuMap.entrySet()) {
+					menuGroups.add(grp.getValue());
+				}
+
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		node.put("menus", menuGroups);
+		return node;
+	}
+	public int findMasterLookupParentId(String type,int parentId){
+		int count = 0;
+		try{
+		  count = masterLookupRepo.findMasterLookupParentId(type, parentId);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return count;
 	}
 
 }

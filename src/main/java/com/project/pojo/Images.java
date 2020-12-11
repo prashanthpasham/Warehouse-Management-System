@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -26,7 +27,8 @@ public class Images {
 
 	@Id
 	@Column(name = "IMAGE_ID")
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name="seq_images",allocationSize=1,sequenceName="seq_images")
+	@GeneratedValue(strategy = GenerationType.AUTO,generator="seq_images")
 	public Integer getImageId() {
 		return imageId;
 	}

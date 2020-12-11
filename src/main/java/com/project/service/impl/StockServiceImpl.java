@@ -1,7 +1,12 @@
 package com.project.service.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +41,11 @@ import com.project.dao.WarehouseInventoryRepository;
 import com.project.dao.WarehouseRepository;
 import com.project.dto.SalesDto;
 import com.project.dto.SalesItemsDto;
-import com.project.dto.SalesItemsTrackDto;
 import com.project.dto.SerialBatchDto;
 import com.project.dto.StockDto;
 import com.project.dto.StockRecieptDto;
 import com.project.dto.StockRecieptSkusDto;
+import com.project.pojo.Images;
 import com.project.pojo.InventoryBatchDetails;
 import com.project.pojo.InventorySerialDetails;
 import com.project.pojo.MasterLookUp;
@@ -57,6 +62,7 @@ import com.project.pojo.Warehouse;
 import com.project.pojo.WarehouseInventory;
 import com.project.pojo.WarehouseInventoryDetails;
 import com.project.service.intf.StockServiceIntf;
+
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
@@ -117,7 +123,9 @@ public class StockServiceImpl implements StockServiceIntf {
 	@Override
 	public String saveStockLookup(StockLookUp stock) {
 		// TODO Auto-generated method stub
-		stockLookupRepo.save(stock);
+		StockLookUp st = stockLookupRepo.save(stock);
+		st.setStockIds((st.getParentId()!=null?st.getParentId().getStockIds():"")+st.getStockLookUpId()+"@");
+		st.setStockNames((st.getParentId()!=null?st.getParentId().getStockNames():"")+st.getName()+"@");
 		return "success";
 	}
 
@@ -184,14 +192,14 @@ public class StockServiceImpl implements StockServiceIntf {
 						item1.put("id", 0);
 						item1.put("parentId", 0);
 						item1.put("name", "All");
-						item1.put("bsid", bt.getMasterLookUp().getMasterId() + "@0");
+						item1.put("stId", bt.getMasterLookUp().getMasterId() + "@0");
 						results.add(item1);
 					}
 					JSONObject obj = new JSONObject();
 					obj.put("id", bt.getStockLookUpId());
-					obj.put("parentId", bt.getParentId());
+					obj.put("parentId", bt.getParentId().getStockLookUpId());
 					obj.put("name", bt.getName());
-					obj.put("bsid", bt.getMasterLookUp().getMasterId() + "@" + bt.getStockLookUpId());
+					obj.put("stId", bt.getMasterLookUp().getMasterId() + "@" + bt.getStockLookUpId());
 					if (lookUpId == 0) {
 						lookUpId = bt.getMasterLookUp().getMasterId();
 					}
@@ -246,15 +254,46 @@ public class StockServiceImpl implements StockServiceIntf {
 				stock.setUnitPrice(dto.getUnitPrice());
 				stock.setDefaultPackSize(dto.getDefaultPackSize());
 				stock.setDefaultPackQty(dto.getDefaultPackQty());
-				stock.setStockLookup(stockLookupRepo.findById(dto.getStockLookupId()).get());
-				stock.setUomConfigId(uomConfigRepo.findById(dto.getUomConfigId()).get());
-				/*
-				 * if (dto.getImages() != null && !dto.getImages().isEmpty()) { List<Images>
-				 * imgList = new ArrayList<Images>(); for (String img : dto.getImages()) {
-				 * Images image = new Images();
-				 * 
-				 * imgList.add(image); } stock.setImages(imgList); }
-				 */
+				Optional<StockLookUp> st=stockLookupRepo.findById(dto.getStockLookupId());
+				if(st.isPresent())
+				stock.setStockLookup(st.get());
+				Optional<UOMConfiguration> uom = uomConfigRepo.findById(dto.getUomConfigId());
+				if(uom.isPresent())
+				stock.setUomConfigId(uom.get());
+
+				if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+					String path = "D://MioImages//";
+					File f = new File(path);
+					if (!f.isDirectory()) {
+						f.mkdir();
+					}
+					List<Images> imgList = new ArrayList<Images>();
+					for (String img : dto.getImages()) {
+						Images image = new Images();
+						try {
+							String filePath = path + "upload_" + new Date().getTime() + ".jpg";
+							System.out.println("filePath>>"+filePath);
+							FileOutputStream out = new FileOutputStream(filePath);
+							byte[] b = Base64.getDecoder().decode(img.split(",")[1]);
+							ByteArrayInputStream ip = new ByteArrayInputStream(b);
+							ByteArrayOutputStream byt = new ByteArrayOutputStream();
+							int k;
+							while ((k = ip.read()) != -1) {
+								byt.write(k);
+							}
+							byt.writeTo(out);
+							image.setCreatedDate(new Date());
+							image.setImagePath(filePath);
+							image.setStockId(stock);
+							imgList.add(image);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
+					}
+					stock.setImages(imgList);
+				}
+
 				stockRepo.save(stock);
 			}
 		} catch (Exception e) {
@@ -331,9 +370,13 @@ public class StockServiceImpl implements StockServiceIntf {
 					JSONObject obj = new JSONObject();
 					obj.put("id", uom.getUomConfigId());
 					obj.put("name", uom.getUomName());
-					obj.put("childUomId", uom.getChildUOMId());
+					obj.put("childId", uom.getChildUOMId());
 					obj.put("childUomIds", uom.getChildUomIds());
-					obj.put("childUomNames", uom.getChildUomNames());
+					String[] ss=uom.getChildUomNames().split("@");
+					String[] s1=ss[ss.length==1?ss.length-1:ss.length-2].split("#");
+					obj.put("childUomName", s1[0]);
+					obj.put("childUomQty", s1[1]);
+					obj.put("quantity", uom.getQuantity());
 					results.add(obj);
 				}
 			});

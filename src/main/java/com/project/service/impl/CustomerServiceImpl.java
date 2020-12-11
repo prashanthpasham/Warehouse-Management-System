@@ -72,7 +72,10 @@ public class CustomerServiceImpl implements CustomerServiceIntf {
 			Iterator it = types.iterator();
 			while (it.hasNext()) {
 				CustomerTypes type = (CustomerTypes) it.next();
-				results.add(type.getCustomerType());
+				JSONObject obj = new JSONObject();
+				obj.put("label", type.getCustomerType());
+				obj.put("value", type.getCustomerTypeId());
+				results.add(obj);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -90,8 +93,8 @@ public class CustomerServiceImpl implements CustomerServiceIntf {
 				Customer customer = new Customer();
 				BeanUtils.copyProperties(dto, customer);
 				customer.setCreatedDate(sdf.parse(dto.getCreatedDate()));
-				customer.setCustomerTypes(custTypeRepo.findByCustomerTypeIgnoreCase(dto.getCustomerType()));
-				customer.setBusinessTerritory(businessTerritoryRepo.findByBsIds(dto.getBusinessId()));
+				customer.setCustomerTypes(custTypeRepo.findByCustomerTypeId(Integer.parseInt(dto.getCustomerType())));
+				customer.setBusinessTerritory(businessTerritoryRepo.findByBusinessId(Integer.parseInt(dto.getBusinessId())));
 				customerRepo.save(customer);
 				result = "success";
 			} else {
